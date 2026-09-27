@@ -8,7 +8,7 @@
 
 ## 在线使用
 
-GitHub Pages：<https://chenshen913.github.io/hotel-stay-toolbox/>（推送 main 后自动部署）
+GitHub Pages：<https://chenchen913.github.io/hotel-stay-toolbox/>（推送 main 后自动部署）
 
 ## 本地使用
 
