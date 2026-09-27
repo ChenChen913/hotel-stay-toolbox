@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-  base: '/stay-toolbox/',
+  base: '/hotel-toolbox/',
   plugins: [vue()],
   test: {
     environment: 'node',

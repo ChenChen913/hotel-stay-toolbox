@@ -3,13 +3,13 @@
 <p align="center">
   <b>English</b> | <a href="./README.md">简体中文</a>
   <br><br>
-  <a href="https://github.com/ChenChen913/stay-toolbox/actions/workflows/deploy.yml"><img src="https://github.com/ChenChen913/stay-toolbox/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
+  <a href="https://github.com/ChenChen913/hotel-toolbox/actions/workflows/deploy.yml"><img src="https://github.com/ChenChen913/hotel-toolbox/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
 Rule-driven hotel stay toolbox: packing list, room & checkout checks, evidence-graded knowledge. No backend.
 
-Use it online: <https://chenchen913.github.io/stay-toolbox/>
+Use it online: <https://chenchen913.github.io/hotel-toolbox/>
 
 ## Table of Contents
 
@@ -39,13 +39,13 @@ Three design decisions, each archived in the repository:
 Requirements: Node.js (the repo CI builds and tests on Node 22), npm.
 
 ```sh
-git clone https://github.com/ChenChen913/stay-toolbox.git
-cd stay-toolbox
+git clone https://github.com/ChenChen913/hotel-toolbox.git
+cd hotel-toolbox
 npm install
 npm run dev
 ```
 
-Open <http://localhost:5173/stay-toolbox/>.
+Open <http://localhost:5173/hotel-toolbox/>.
 
 ## Usage
 
@@ -114,7 +114,7 @@ A: The design settles on fixed rules: they are explainable, testable and work of
 
 ## Contributing
 
-This is a personal project. Questions and suggestions are welcome through [Issues](https://github.com/ChenChen913/stay-toolbox/issues); please open an Issue before sending a PR.
+This is a personal project. Questions and suggestions are welcome through [Issues](https://github.com/ChenChen913/hotel-toolbox/issues); please open an Issue before sending a PR.
 
 ## License
 

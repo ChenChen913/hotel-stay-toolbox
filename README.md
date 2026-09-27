@@ -3,7 +3,7 @@
 <p align="center">
   <b>简体中文</b> | <a href="./README_EN.md">English</a>
   <br><br>
-  <a href="https://github.com/ChenChen913/stay-toolbox/actions/workflows/deploy.yml"><img src="https://github.com/ChenChen913/stay-toolbox/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
+  <a href="https://github.com/ChenChen913/hotel-toolbox/actions/workflows/deploy.yml"><img src="https://github.com/ChenChen913/hotel-toolbox/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
@@ -11,7 +11,7 @@ Rule-driven hotel stay toolbox: packing list, room & checkout checks, evidence-g
 
 中文：规则驱动的酒店入住工具箱——准备清单、入住与退房检查、证据分级知识库。无后端，手机优先。
 
-在线使用：<https://chenchen913.github.io/stay-toolbox/>
+在线使用：<https://chenchen913.github.io/hotel-toolbox/>
 
 ## 目录
 
@@ -41,13 +41,13 @@ Rule-driven hotel stay toolbox: packing list, room & checkout checks, evidence-g
 前置要求：Node.js（仓库 CI 在 Node 22 下构建与测试）、npm。
 
 ```sh
-git clone https://github.com/ChenChen913/stay-toolbox.git
-cd stay-toolbox
+git clone https://github.com/ChenChen913/hotel-toolbox.git
+cd hotel-toolbox
 npm install
 npm run dev
 ```
 
-打开 <http://localhost:5173/stay-toolbox/> 即可使用。
+打开 <http://localhost:5173/hotel-toolbox/> 即可使用。
 
 ## 用法
 
@@ -116,7 +116,7 @@ A：设计定稿是固定规则驱动：规则可解释、可测试、离线可�
 
 ## 如何贡献
 
-这是个人项目，欢迎通过 [Issues](https://github.com/ChenChen913/stay-toolbox/issues) 提出问题与建议；PR 请先开 Issue 讨论。
+这是个人项目，欢迎通过 [Issues](https://github.com/ChenChen913/hotel-toolbox/issues) 提出问题与建议；PR 请先开 Issue 讨论。
 
 ## 许可证
 
