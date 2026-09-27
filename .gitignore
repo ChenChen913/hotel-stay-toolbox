@@ -2,3 +2,4 @@ node_modules/
 dist/
 _shots/
 tsconfig.tsbuildinfo
+facts.md

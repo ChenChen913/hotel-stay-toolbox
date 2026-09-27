@@ -1,5 +1,5 @@
 {
-  "name": "hotel-stay-toolbox",
+  "name": "stay-toolbox",
   "private": true,
   "version": "2.0.0",
   "type": "module",
@@ -20,5 +20,13 @@
     "vite": "^6.0.5",
     "vitest": "^3.0.5",
     "vue-tsc": "^2.2.0"
-  }
+  },
+  "description": "Rule-driven hotel stay toolbox: packing list, room & checkout checks, evidence-graded knowledge. No backend.",
+  "license": "MIT",
+  "homepage": "https://chenchen913.github.io/stay-toolbox/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenChen913/stay-toolbox.git"
+  },
+  "author": "ChenChen913"
 }
