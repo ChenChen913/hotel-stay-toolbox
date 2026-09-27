@@ -5,260 +5,401 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>酒店入住工具箱</title>
 <style>
-  :root { --bg:#f5f6f8; --card:#fff; --ink:#22272e; --sub:#6b7280; --line:#e5e7eb; --brand:#2563eb; --brand-soft:#dbeafe; --ok:#16a34a; --danger:#dc2626; }
+  :root {
+    --bg:#f6f4ee; --card:#fffdf9; --ink:#24312f; --sub:#7d8a86; --line:#e6e1d3;
+    --brand:#0e6f63; --brand-deep:#0a5349; --brand-soft:#e3f0ec;
+    --gold:#c9a227; --amber:#b45309; --danger:#b3372f;
+    --serif:"Songti SC","STSong","Noto Serif SC","SimSun",serif;
+  }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
-  header { padding:18px 16px 6px; max-width:640px; margin:0 auto; }
-  header h1 { font-size:20px; margin:0; }
-  header p { margin:2px 0 0; color:var(--sub); font-size:13px; }
-  main { max-width:640px; margin:0 auto; padding:10px 14px 90px; }
-  nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); border-top:1px solid var(--line); display:flex; max-width:640px; margin:0 auto; }
-  nav button { flex:1; padding:13px 0 calc(13px + env(safe-area-inset-bottom)); background:none; border:0; font-size:14px; color:var(--sub); }
-  nav button.on { color:var(--brand); font-weight:600; }
-  .card { background:var(--card); border-radius:14px; padding:14px 16px; margin:10px 0; box-shadow:0 1px 3px rgb(0 0 0 / .05); }
-  .btn { display:block; width:100%; min-height:48px; border:0; border-radius:12px; background:var(--brand); color:#fff; font-size:17px; font-weight:600; margin:10px 0; cursor:pointer; }
-  .btn.ghost { background:var(--brand-soft); color:var(--brand); }
-  .btn.small { display:inline-block; width:auto; min-height:38px; padding:6px 16px; font-size:14px; border-radius:10px; }
-  .btn.plain { background:#eef0f3; color:var(--ink); }
-  .row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); }
+  body {
+    margin:0; color:var(--ink);
+    font:16px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1100px 520px at 85% -8%, #e7f1ec 0%, transparent 60%),
+               radial-gradient(800px 400px at -10% 30%, #f3ecdd 0%, transparent 55%),
+               var(--bg);
+    background-attachment:fixed;
+  }
+  main { max-width:680px; margin:0 auto; padding:18px 16px 96px; }
+  /* ---- 顶部条 ---- */
+  .topbar { max-width:680px; margin:0 auto; padding:14px 18px 0; display:flex; align-items:baseline; gap:10px; }
+  .topbar .b { font-family:var(--serif); font-size:18px; letter-spacing:.06em; color:var(--brand-deep); }
+  .topbar .t { font-size:12px; color:var(--sub); }
+  /* ---- 入场动画 ---- */
+  @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  .hero, .card, .btn, h2, .tabs, .dots, .staycard { animation:rise .35s ease both; }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  /* ---- 首页 key-card ---- */
+  .hero {
+    background:linear-gradient(140deg,#0f7a6c 0%,#0a5349 75%);
+    color:#f3efe4; border-radius:22px; padding:30px 24px 26px; position:relative; overflow:hidden;
+    box-shadow:0 18px 40px -20px rgba(10,83,73,.55);
+  }
+  .hero::after { content:""; position:absolute; inset:9px; border:1px solid rgba(243,239,228,.28); border-radius:16px; pointer-events:none; }
+  .hero .k { font-family:var(--serif); font-size:26px; letter-spacing:.05em; }
+  .hero .s { opacity:.85; font-size:13.5px; margin:8px 0 20px; }
+  .hero .go { display:block; width:100%; min-height:48px; border:0; border-radius:13px;
+    background:#f3efe4; color:var(--brand-deep); font-size:16.5px; font-weight:700; cursor:pointer; }
+  .hero .room { position:absolute; right:22px; top:24px; font-family:var(--serif); font-size:13px; letter-spacing:.2em; opacity:.55; }
+  /* ---- 底部导航 ---- */
+  nav { position:fixed; bottom:0; left:0; right:0; max-width:680px; margin:0 auto;
+    background:rgba(255,253,249,.94); backdrop-filter:blur(12px); border-top:1px solid var(--line); display:flex; }
+  nav button { flex:1; padding:12px 0 calc(12px + env(safe-area-inset-bottom)); background:none; border:0; font-size:13.5px; color:var(--sub); cursor:pointer; }
+  nav button.on { color:var(--brand); font-weight:700; }
+  /* ---- 通用卡片/标题 ---- */
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:6px 16px; margin:12px 0; box-shadow:0 2px 10px -6px rgba(60,50,30,.12); }
+  .card.pad { padding:16px; }
+  h2 { font-family:var(--serif); font-size:15px; letter-spacing:.1em; color:#5f6e6a; font-weight:600;
+    display:flex; align-items:center; gap:10px; margin:20px 2px 8px; }
+  h2::after { content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--line),transparent); }
+  /* ---- 清单行 ---- */
+  .row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px dashed var(--line); transition:background .15s; }
   .row:last-child { border-bottom:0; }
   .row .grow { flex:1; min-width:0; }
-  .row .name { font-size:16px; }
-  .row.done .name { color:var(--sub); text-decoration:line-through; }
-  .tag { font-size:11px; padding:2px 8px; border-radius:99px; background:#eef0f3; color:var(--sub); white-space:nowrap; }
-  .tag.buy { background:#fef3c7; color:#92400e; }
-  .tag.need { background:#fee2e2; color:#991b1b; }
-  .tag.src { background:var(--brand-soft); color:var(--brand); }
-  .stepper { display:flex; align-items:center; gap:2px; }
-  .stepper button { width:32px; height:32px; border-radius:8px; border:1px solid var(--line); background:#fff; font-size:16px; }
-  .stepper b { min-width:30px; text-align:center; }
-  h2 { font-size:15px; margin:18px 0 6px; color:var(--sub); font-weight:600; }
-  .prog { height:8px; background:#eef0f3; border-radius:99px; overflow:hidden; margin:8px 0; }
-  .prog i { display:block; height:100%; background:var(--ok); transition:width .2s; }
-  .progtext { font-size:13px; color:var(--sub); }
-  .opts { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-  .opt { min-height:48px; padding:10px 18px; border-radius:12px; border:1.5px solid var(--line); background:#fff; font-size:16px; cursor:pointer; }
-  .opt.on { border-color:var(--brand); background:var(--brand-soft); color:var(--brand); font-weight:600; }
-  input[type=text], input[type=number], input[type=date], select { min-height:44px; padding:8px 12px; border:1.5px solid var(--line); border-radius:10px; font-size:16px; background:#fff; }
-  input[type=checkbox].tick { width:22px; height:22px; accent-color:var(--ok); }
-  details { border-bottom:1px solid var(--line); padding:10px 0; }
+  .row .name { font-size:16px; transition:color .15s; }
+  .row .meta { font-size:12px; color:var(--sub); margin-top:1px; display:flex; align-items:center; gap:6px; }
+  .row.done .name { color:var(--sub); text-decoration:line-through; text-decoration-color:rgba(125,138,134,.6); }
+  /* ---- 自定义勾选框 ---- */
+  input[type=checkbox].tick { appearance:none; -webkit-appearance:none; width:24px; height:24px; flex-shrink:0;
+    border:2px solid #cdc6b4; border-radius:8px; background:#fff; display:grid; place-content:center; cursor:pointer; transition:.15s; margin:0; }
+  input[type=checkbox].tick::after { content:""; width:12px; height:7px; border-left:2.5px solid #fff; border-bottom:2.5px solid #fff;
+    transform:rotate(-45deg) scale(0); transition:transform .15s; margin-top:-2px; }
+  input[type=checkbox].tick:checked { background:var(--brand); border-color:var(--brand); }
+  input[type=checkbox].tick:checked::after { transform:rotate(-45deg) scale(1); }
+  /* ---- 标签 ---- */
+  .tag { font-size:11px; padding:1.5px 9px; border-radius:99px; border:1px solid transparent; white-space:nowrap; }
+  .tag.buy { background:#fcf3e2; color:var(--amber); border-color:#f2e0bd; }
+  .tag.need { background:#fbeae8; color:var(--danger); border-color:#f0d2ce; }
+  .tag.home { background:#eef0e7; color:#66704f; border-color:#e0e4d3; }
+  .tag.rec { background:var(--brand-soft); color:var(--brand-deep); border-color:#cfe4dd; }
+  .tag.opt { background:#f0eee6; color:var(--sub); border-color:var(--line); }
+  .tag.src { background:#efe9f7; color:#6d4fa1; border-color:#e2d6f0; }
+  /* ---- 数量步进 ---- */
+  .stepper { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+  .stepper .st { width:30px; height:30px; border-radius:9px; border:1px solid var(--line); background:#fff; font-size:15px; color:var(--brand-deep); cursor:pointer; }
+  .stepper .st:active { background:var(--brand-soft); }
+  .stepper .qty-val { min-width:28px; text-align:center; font-size:15.5px; }
+  .stepper .unit { font-size:12px; color:var(--sub); }
+  .del { border:0; background:none; color:#c0b9a8; font-size:15px; padding:6px 4px; cursor:pointer; }
+  .del:active { color:var(--danger); }
+  /* ---- 进度 ---- */
+  .prog { height:10px; background:#eae6d8; border-radius:99px; overflow:hidden; margin:10px 0 6px; }
+  .prog i { display:block; height:100%; background:linear-gradient(90deg,#149a82,var(--brand)); border-radius:99px; transition:width .3s; }
+  .progtext { font-size:13px; color:var(--sub); margin-bottom:12px; }
+  .progtext b { color:var(--brand-deep); font-size:15px; }
+  /* ---- 分段标签页 ---- */
+  .tabs { display:flex; background:#ebe7da; border-radius:14px; padding:4px; gap:4px; margin:14px 0 4px; }
+  .tabs button { flex:1; min-height:42px; border:0; border-radius:11px; background:transparent; font-size:15px; color:var(--sub); cursor:pointer; }
+  .tabs button.on { background:var(--card); color:var(--brand-deep); font-weight:700; box-shadow:0 2px 8px rgba(60,50,30,.12); }
+  /* ---- 按钮 ---- */
+  .btn { display:block; width:100%; min-height:50px; border:0; border-radius:14px; background:var(--brand);
+    color:#fff; font-size:16.5px; font-weight:700; margin:14px 0; cursor:pointer; letter-spacing:.02em;
+    box-shadow:0 12px 24px -14px rgba(14,111,99,.65); transition:transform .12s; }
+  .btn:active { transform:scale(.98); }
+  .btn.ghost { background:var(--brand-soft); color:var(--brand-deep); box-shadow:none; }
+  .btn.plain { background:#eee9dc; color:var(--ink); box-shadow:none; font-weight:500; }
+  .btn.small { display:inline-block; width:auto; min-height:40px; padding:7px 18px; font-size:14px; border-radius:11px; margin:0; }
+  /* ---- 向导 ---- */
+  .dots { display:flex; gap:6px; justify-content:center; margin:6px 0 4px; }
+  .dots span { width:24px; height:5px; border-radius:99px; background:#e0dac9; transition:background .2s; }
+  .dots span.on { background:var(--brand); }
+  .dots span.cur { background:var(--gold); width:36px; }
+  .q { font-size:18px; font-weight:600; margin:14px 2px 2px; }
+  .q small { display:block; font-size:13px; color:var(--sub); font-weight:400; margin-top:3px; }
+  .opts { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .opt { min-height:48px; padding:10px 20px; border-radius:13px; border:1.5px solid var(--line); background:#fff;
+    font-size:16px; cursor:pointer; transition:.15s; }
+  .opt.on { border-color:var(--brand); background:var(--brand-soft); color:var(--brand-deep); font-weight:700; }
+  .opt.on::before { content:"✓ "; }
+  input[type=text], input[type=number], input[type=date], select {
+    min-height:46px; padding:9px 13px; border:1.5px solid var(--line); border-radius:12px;
+    font-size:16px; background:#fff; color:var(--ink); }
+  input:focus, select:focus { outline:2px solid var(--brand-soft); border-color:var(--brand); }
+  /* ---- 行程卡 ---- */
+  .staycard { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin:10px 0;
+    cursor:pointer; box-shadow:0 2px 10px -6px rgba(60,50,30,.12); }
+  @media (hover:hover) { .staycard:hover { border-color:var(--brand); } }
+  .empty { border:1.5px dashed #d8d1bd; border-radius:16px; padding:30px 20px; text-align:center; color:var(--sub); font-size:14px; margin:12px 0; }
+  .empty .e { font-size:34px; display:block; margin-bottom:8px; }
+  /* ---- 知识库 ---- */
+  details { border-bottom:1px dashed var(--line); padding:12px 0; }
   details:last-child { border-bottom:0; }
-  summary { cursor:pointer; font-weight:600; font-size:15.5px; }
-  details .body { margin:8px 0 4px; font-size:14.5px; color:#3d4450; }
-  details .src { font-size:12px; color:var(--sub); }
-  .hint { font-size:13px; color:var(--sub); }
-  .tabs { display:flex; gap:6px; margin:10px 0; }
-  .tabs button { flex:1; min-height:42px; border-radius:10px; border:1.5px solid var(--line); background:#fff; font-size:15px; }
-  .tabs button.on { border-color:var(--brand); background:var(--brand-soft); color:var(--brand); font-weight:600; }
+  summary { cursor:pointer; font-weight:600; font-size:15.5px; list-style:none; display:flex; align-items:center; gap:8px; }
+  summary::-webkit-details-marker { display:none; }
+  summary::before { content:"▸"; color:var(--gold); transition:transform .2s; font-size:13px; }
+  details[open] summary::before { transform:rotate(90deg); }
+  details .body { margin:10px 2px 6px; font-size:14.5px; color:#45514d; }
+  details .src { font-size:12px; color:var(--sub); border-top:1px dashed var(--line); padding-top:8px; margin-top:8px; }
+  .legend { font-size:12.5px; color:var(--sub); background:var(--brand-soft); border-radius:12px; padding:10px 14px; margin:10px 0; }
   .muted { color:var(--sub); font-size:13px; }
-  .del { border:0; background:none; color:var(--danger); font-size:18px; padding:6px; cursor:pointer; }
+  .backlink { color:var(--brand-deep); text-decoration:none; font-size:14px; }
 </style>
 </head>
 <body>
-<header><h1>🏨 酒店入住工具箱</h1><p>让每一次入住都少一点遗漏，多一点准备</p></header>
+<div class="topbar" id="topbar"><span class="b">🏨 酒店入住工具箱</span><span class="t">STAY TOOLBOX</span></div>
 <main id="app"></main>
 <nav>
-  <button id="navHome" onclick="go('home')">🏠 首页</button>
-  <button id="navKnow" onclick="go('know')">📚 知识库</button>
+  <button id="navHome" data-act="go" data-v="home">🏠 首页</button>
+  <button id="navKnow" data-act="go" data-v="know">📚 知识库</button>
 </nav>
 <script src="data.js"></script>
 <script src="engine.js"></script>
 <script>
 'use strict';
-// —— 极简路由：home / wizard / stay / know ——
-let view = 'home', currentStayId = null, tab = 'prep';
-let wiz = null; // 向导临时状态
+// 路由：home / wizard / stay / know
+let view = 'home', currentStayId = null, tab = 'prep', wiz = null;
+const app = document.getElementById('app');
 
-function go(v) { view = v; render(); }
-function esc(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function pct(done, all) { return all ? Math.round(done * 100 / all) : 0; }
-function countDone(items) { return items.filter(i => i.done).length; }
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const pct = (d, a) => a ? Math.round(d * 100 / a) : 0;
+const countDone = items => items.filter(i => i.done).length;
+const stayItems = () => sortItems([...stay().prep, ...stay().custom]);
+const stay = () => getStay(currentStayId);
+
+// —— 交互全部走事件委托（挂在 document，底部导航也在其中）；勾选/步进只做局部 DOM 更新，不整页重绘（修「乱跳」）——
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  switch (el.dataset.act) {
+    case 'go': go(el.dataset.v); break;
+    case 'open-stay': openStay(el.dataset.id); break;
+    case 'copy-last': copyLast(); break;
+    case 'start-wizard': startWizard(); break;
+    case 'wiz-goto': wiz.step = +el.dataset.v; render(); break;
+    case 'wiz-adults': wiz.adults = +el.dataset.v; render(); break;
+    case 'wiz-kids': wiz.children = +el.dataset.v; render(); break;
+    case 'wiz-age': wiz.childAge = el.dataset.v; render(); break;
+    case 'wiz-toggle': {
+      const k = el.dataset.v;
+      if (k === 'elderly') wiz.elderly = !wiz.elderly; else if (k === 'pet') wiz.pet = !wiz.pet;
+      else wiz.prefs[k] = !wiz.prefs[k];
+      render(); break;
+    }
+    case 'wiz-purpose': wiz.purpose = el.dataset.v; render(); break;
+    case 'wiz-add': wizAddCustom(); break;
+    case 'wiz-save': wizSave(); break;
+    case 'tab': tab = el.dataset.v; render(); break;
+    case 'qty': qtyStep(+el.dataset.idx, +el.dataset.d, el); break;
+    case 'del-item': delItem(+el.dataset.idx); break;
+    case 'stay-add': stayAddCustom(); break;
+    case 'del-stay': delStayUI(); break;
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.bind) { // 向导输入：只存值不重绘（避免手机键盘跳动）
+    if (el.dataset.bind === 'date') wiz.date = el.value;
+    if (el.dataset.bind === 'nights') wiz.nights = Math.max(1, Math.min(30, +el.value || 1));
+    return;
+  }
+  if (el.dataset.act === 'prep-toggle') {
+    const s = stay();
+    const it = sortItems([...s.prep, ...s.custom])[+el.dataset.idx];
+    it.done = el.checked; saveStay(s);
+    el.closest('.row').classList.toggle('done', el.checked);
+    updateProg();
+  }
+  if (el.dataset.act === 'check-toggle') {
+    const s = stay(); s[el.dataset.key][+el.dataset.gi][+el.dataset.ii] = el.checked; saveStay(s);
+    el.closest('.row').classList.toggle('done', el.checked);
+    updateProg();
+  }
+});
+
+// ---------- 视图切换（只有这里才滚动到顶） ----------
+function go(v) { view = v; render(); window.scrollTo({ top: 0 }); }
+function openStay(id) { currentStayId = id; view = 'stay'; tab = 'prep'; render(); window.scrollTo({ top: 0 }); }
+function render() {
+  app.innerHTML = view === 'home' ? renderHome() : view === 'wizard' ? renderWizard()
+    : view === 'stay' ? renderStay() : renderKnow();
+  document.getElementById('navHome').className = view !== 'know' ? 'on' : '';
+  document.getElementById('navKnow').className = view === 'know' ? 'on' : '';
+}
 
 // ---------- 首页 ----------
 function renderHome() {
   const stays = listStays().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  let html = '';
-  html += `<button class="btn" onclick="startWizard()">＋ 创建一次入住</button>`;
-  if (stays.length) html += `<button class="btn ghost" onclick="copyLast()">⧉ 复制上一次入住</button>`;
+  let html = `<div class="hero"><span class="room">NO. 01</span>
+    <div class="k">酒店入住工具箱</div>
+    <div class="s">让每一次入住，都少一点遗漏，多一点准备</div>
+    <button class="go" data-act="start-wizard">＋ 创建一次入住</button></div>`;
+  if (stays.length) html += `<button class="btn ghost" data-act="copy-last">⧉ 复制上一次入住</button>`;
+  else html += `<div class="empty"><span class="e">🛎️</span>第一次使用：点上面按钮，回答 5 个小问题<br>系统帮你生成这次入住的准备清单（含数量）<br><br>数据只保存在本机浏览器</div>`;
   if (stays.length) {
     html += `<h2>最近的入住</h2>`;
     for (const s of stays) {
-      const all = s.prep.length + s.custom.length, done = countDone(s.prep) + countDone(s.custom);
-      html += `<div class="card row" style="cursor:pointer" onclick="openStay('${s.id}')">
-        <div class="grow"><div class="name">${esc(s.date || '未填日期')} · ${s.nights} 晚</div>
-        <div class="progtext">准备 ${done}/${all}　·　${s.conditions.purpose || '普通短住'}</div></div>›</div>`;
+      const items = sortItems([...s.prep, ...s.custom]);
+      const done = countDone(items), all = items.length;
+      html += `<div class="staycard" data-act="open-stay" data-id="${s.id}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1"><b>${esc(s.date || '未填日期')} · ${s.nights} 晚</b>
+          <div class="muted">${esc(s.conditions.purpose || '普通短住')}${s.conditions.children ? ' · 带' + s.conditions.children + '个儿童' : ''}${s.conditions.elderly ? ' · 有老人' : ''}</div></div>
+          <span class="muted">›</span></div>
+        <div class="prog" style="margin:10px 0 4px"><i style="width:${pct(done, all)}%"></i></div>
+        <div class="muted" style="font-size:12px">准备 ${done}/${all}</div></div>`;
     }
-  } else {
-    html += `<div class="card hint">第一次使用：点上面按钮，回答 5 个小问题，系统帮你生成这次入住的准备清单（含数量）。数据只保存在本机浏览器。</div>`;
   }
   return html;
 }
-
 function copyLast() {
   const stays = listStays().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   if (!stays.length) return;
-  const last = stays[0];
-  const c = { ...last.conditions, date: '' };
-  const stay = newStay(c, buildPrep(c));
-  stay.custom = last.custom.map(i => ({ ...i, done: false }));
-  saveStay(stay); openStay(stay.id);
+  const c = { ...stays[0].conditions, date: '' };
+  const s = newStay(c, buildPrep(c));
+  s.custom = stays[0].custom.map(i => ({ ...i, done: false }));
+  saveStay(s); openStay(s.id);
 }
 
 // ---------- 向导 ----------
 function startWizard() {
   wiz = { step: 1, date: '', nights: 1, adults: 1, children: 0, childAge: '0-3', elderly: false, pet: false,
-          purpose: '普通短住', prefs: { sleep: false, hygiene: false, mosquito: false, gadgets: false } };
-  view = 'wizard'; render();
+          purpose: '普通短住', prefs: { sleep: false, hygiene: false, mosquito: false, gadgets: false }, preview: null };
+  view = 'wizard'; render(); window.scrollTo({ top: 0 });
 }
-function wizTogglePref(k) { wiz.prefs[k] = !wiz.prefs[k]; render(); }
+const dots = () => `<div class="dots">${[1,2,3,4,5].map(i => `<span class="${i < wiz.step ? 'on' : i === wiz.step ? 'cur' : ''}"></span>`).join('')}</div>`;
+const optBtn = (on, act, v, label) => `<button class="opt ${on ? 'on' : ''}" data-act="${act}" data-v="${v}">${label}</button>`;
 
 function renderWizard() {
   const w = wiz;
-  const head = `<div class="hint">第 ${w.step} 步，共 5 步</div>`;
-  if (w.step === 1) return head + `<div class="card">
-    <label>入住日期</label><br><input type="date" id="wDate" value="${w.date}" onchange="wiz.date=this.value"><br><br>
-    <label>住几晚</label><br><input type="number" min="1" max="30" value="${w.nights}" onchange="wiz.nights=Math.max(1,Math.min(30,+this.value||1))">
-    <p class="hint">晚数 ≥ 4 会自动加长住物品（洗衣、晾衣）。</p></div>
-    <button class="btn" onclick="wiz.step=2;render()">下一步 →</button>`;
-  if (w.step === 2) return head + `<div class="card"><label>这次有几个人入住？</label>
-    <div class="opts">${[1,2,3].map(n=>`<button class="opt ${w.adults===n?'on':''}" onclick="wiz.adults=${n};render()">${n===3?'3 人及以上':n+' 人'}</button>`).join('')}</div></div>
-    <button class="btn" onclick="wiz.step=3;render()">下一步 →</button>`;
-  if (w.step === 3) return head + `<div class="card">
-    <label>有儿童同行吗？</label>
-    <div class="opts">${[0,1,2].map(n=>`<button class="opt ${w.children===n?'on':''}" onclick="wiz.children=${n};render()">${n===0?'没有':n+' 个'}</button>`).join('')}</div>
-    ${w.children>0?`<br><label>儿童年龄段</label>
-    <div class="opts">${[['0-3','0–3 岁'],['4-6','4–6 岁'],['7-12','7–12 岁'],['13+','13 岁以上']].map(([v,t])=>`<button class="opt ${w.childAge===v?'on':''}" onclick="wiz.childAge='${v}';render()">${t}</button>`).join('')}</div>`:''}
-    <br><label>还有谁同行？</label>
-    <div class="opts">
-      <button class="opt ${w.elderly?'on':''}" onclick="wiz.elderly=!wiz.elderly;render()">👴 老人</button>
-      <button class="opt ${w.pet?'on':''}" onclick="wiz.pet=!wiz.pet;render()">🐶 宠物</button>
-    </div>
-    ${w.pet?'<p class="hint">宠物用品差异大，稍后在清单里自行添加。</p>':''}</div>
-    <button class="btn" onclick="wiz.step=4;render()">下一步 →</button>`;
-  if (w.step === 4) return head + `<div class="card"><label>这次住宿属于哪种情况？</label>
-    <div class="opts">${['普通短住','出差','旅游','探亲'].map(p=>`<button class="opt ${w.purpose===p?'on':''}" onclick="wiz.purpose='${p}';render()">${p}</button>`).join('')}</div></div>
-    <button class="btn" onclick="wiz.step=5;render()">下一步 →</button>`;
-  if (w.step === 5) return head + `<div class="card"><label>你在意哪些方面？（都会加进清单）</label>
-    <div class="opts">
-      <button class="opt ${w.prefs.sleep?'on':''}" onclick="wizTogglePref('sleep')">😴 睡眠敏感</button>
-      <button class="opt ${w.prefs.hygiene?'on':''}" onclick="wizTogglePref('hygiene')">🧼 在意卫生</button>
-      <button class="opt ${w.prefs.mosquito?'on':''}" onclick="wizTogglePref('mosquito')">🦟 蚊虫季节</button>
-      <button class="opt ${w.prefs.gadgets?'on':''}" onclick="wizTogglePref('gadgets')">🔌 电子设备多</button>
-    </div></div>
-    <button class="btn" onclick="wiz.step=6;render()">生成清单 →</button>`;
-  // 第 6 步：预览 + 调整
-  if (wiz.preview == null) {
-    wiz.preview = sortItems(buildPrep(w));
-  }
-  return `<div class="hint">确认清单：可改数量、可删，稍后也能加自定义物品。</div>${renderPrepList(wiz.preview, true)}
-    <div class="card"><b>🧠 还有一些东西只有你自己知道</b>
-    ${CUSTOM_HINTS.map(h=>`<div class="row"><span>${h.icon}</span><span class="grow hint">${h.text}</span></div>`).join('')}
+  if (w.step === 1) return dots() + `<div class="q">什么时候入住？</div><div class="card pad">
+    <input type="date" data-bind="date" value="${w.date}" style="width:100%"><br><br>
+    <input type="number" data-bind="nights" min="1" max="30" value="${w.nights}" style="width:100%">
+    <div class="muted" style="margin-top:8px">住几晚（填数字）。≥ 4 晚自动加长住物品（洗衣、晾衣）。</div></div>
+    <button class="btn" data-act="wiz-goto" data-v="2">下一步 →</button>`;
+  if (w.step === 2) return dots() + `<div class="q">这次有几个人入住？</div><div class="card pad">
+    <div class="opts">${[1,2,3].map(n => optBtn(w.adults === n, 'wiz-adults', n, n === 3 ? '3 人及以上' : n + ' 人')).join('')}</div></div>
+    <button class="btn" data-act="wiz-goto" data-v="3">下一步 →</button>`;
+  if (w.step === 3) return dots() + `<div class="q">谁和你同行？</div><div class="card pad">
+    <div class="opts">${[0,1,2].map(n => optBtn(w.children === n, 'wiz-kids', n, n === 0 ? '没有儿童' : n + ' 个儿童')).join('')}</div>
+    ${w.children > 0 ? `<div class="opts" style="margin-top:10px">${[['0-3','0–3 岁'],['4-6','4–6 岁'],['7-12','7–12 岁'],['13+','13 岁以上']].map(([v,t]) => optBtn(w.childAge === v, 'wiz-age', v, t)).join('')}</div>` : ''}
+    <div class="opts" style="margin-top:10px">${optBtn(w.elderly, 'wiz-toggle', 'elderly', '👴 有老人')}${optBtn(w.pet, 'wiz-toggle', 'pet', '🐶 有宠物')}</div>
+    ${w.pet ? '<div class="muted" style="margin-top:8px">宠物用品差异大，稍后在清单里自行添加。</div>' : ''}</div>
+    <button class="btn" data-act="wiz-goto" data-v="4">下一步 →</button>`;
+  if (w.step === 4) return dots() + `<div class="q">这次住宿属于哪种情况？</div><div class="card pad">
+    <div class="opts">${['普通短住','出差','旅游','探亲'].map(p => optBtn(w.purpose === p, 'wiz-purpose', p, p)).join('')}</div></div>
+    <button class="btn" data-act="wiz-goto" data-v="5">下一步 →</button>`;
+  if (w.step === 5) return dots() + `<div class="q">你在意哪些方面？<small>选中的会加进清单，之后随时可改</small></div><div class="card pad">
+    <div class="opts">${optBtn(w.prefs.sleep, 'wiz-toggle', 'sleep', '😴 睡眠敏感')}${optBtn(w.prefs.hygiene, 'wiz-toggle', 'hygiene', '🧼 在意卫生')}
+    ${optBtn(w.prefs.mosquito, 'wiz-toggle', 'mosquito', '🦟 蚊虫季节')}${optBtn(w.prefs.gadgets, 'wiz-toggle', 'gadgets', '🔌 电子设备多')}</div></div>
+    <button class="btn" data-act="wiz-goto" data-v="6">生成清单 →</button>`;
+  // 第 6 步：预览
+  if (!w.preview) w.preview = sortItems(buildPrep(w));
+  return `<div class="q">确认清单<small>可改数量、可删，保存后也能随时加东西</small></div>${wizListHTML()}
+    <div class="card pad"><b>🧠 还有一些东西，只有你自己知道</b>
+    ${CUSTOM_HINTS.map(h => `<div class="row"><span>${h.icon}</span><span class="muted" style="flex:1">${h.text}</span></div>`).join('')}
     <div style="display:flex;gap:8px;margin-top:10px">
-      <input type="text" id="cName" placeholder="物品名，如：相机电池" style="flex:1">
-      <input type="number" id="cQty" value="1" min="1" style="width:64px" title="数量">
-      <button class="btn small" onclick="wizAddCustom()">＋</button>
-    </div></div>
-    <button class="btn" onclick="wizSave()">✅ 保存这次入住</button>
-    <button class="btn plain" onclick="wiz.step=5;render()">← 上一步</button>`;
+      <input type="text" id="w-cname" placeholder="物品名，如：相机电池" style="flex:1">
+      <input type="number" id="w-cqty" value="1" min="1" style="width:64px" title="数量">
+      <button class="btn small" data-act="wiz-add">＋</button></div></div>
+    <button class="btn" data-act="wiz-save">✅ 保存这次入住</button>
+    <button class="btn plain" data-act="wiz-goto" data-v="5">← 上一步</button>`;
+}
+const TAG_CLS = { '必带': 'need', '建议购买': 'buy', '家里带': 'home', '推荐': 'rec', '可选': 'opt', '自定义': 'src' };
+function wizListHTML() {
+  const cats = [...new Set(wiz.preview.map(i => i.cat))].sort((a, b) => CAT_ORDER.indexOf(a) - CAT_ORDER.indexOf(b));
+  return cats.map(cat => `<h2>${cat}</h2><div class="card">` +
+    wiz.preview.map((it, idx) => ({ it, idx })).filter(x => x.it.cat === cat).map(({ it, idx }) =>
+      `<div class="row"><div class="grow"><div class="name">${esc(it.name)}</div>
+        <div class="meta">${it.users} · <span class="tag ${TAG_CLS[it.prep] || ''}">${it.prep}</span></div></div>
+        <div class="stepper"><button class="st" data-act="qty" data-idx="${idx}" data-d="-1">−</button><b class="qty-val">${it.qty}</b><button class="st" data-act="qty" data-idx="${idx}" data-d="1">＋</button><span class="unit">${esc(it.unit)}</span></div>
+        ${it.source === '自定义' ? `<button class="del" data-act="del-item" data-idx="${idx}">✕</button>` : ''}</div>`).join('') + '</div>').join('');
 }
 function wizAddCustom() {
-  const name = document.getElementById('cName').value.trim();
+  const name = document.getElementById('w-cname').value.trim();
   if (!name) return;
-  wiz.preview.push({ name, cat: '自定义', unit: '件', prep: '自定义', source: '自定义', users: '共用', qty: +document.getElementById('cQty').value || 1, done: false });
+  wiz.preview.push({ name, cat: '自定义', unit: '件', prep: '自定义', source: '自定义', users: '共用',
+    qty: +document.getElementById('w-cqty').value || 1, done: false });
   render();
 }
 function wizSave() {
-  const stay = newStay({ ...wiz, date: wiz.date }, wiz.preview);
-  saveStay(stay); wiz = null; openStay(stay.id);
+  const s = newStay({ ...wiz, date: wiz.date }, wiz.preview);
+  saveStay(s); wiz = null; openStay(s.id);
 }
 
 // ---------- 行程详情 ----------
-function openStay(id) { currentStayId = id; view = 'stay'; tab = 'prep'; render(); }
-function stay() { return getStay(currentStayId); }
-
-function renderPrepList(items, isWiz) {
-  const s = isWiz ? null : stay();
-  const cats = [...new Set(items.map(i => i.cat))].sort((a, b) => CAT_ORDER.indexOf(a) - CAT_ORDER.indexOf(b));
-  return cats.map(cat => `<h2>${cat}</h2><div class="card">` + items.filter(i => i.cat === cat).map((i) => {
-    const idx = items.indexOf(i);
-    const prepTag = i.prep === '必带' ? '<span class="tag need">必带</span>' : i.prep === '建议购买' ? '<span class="tag buy">要买</span>' : i.prep === '自定义' ? '<span class="tag src">自定义</span>' : `<span class="tag">${i.prep}</span>`;
-    const doneCb = isWiz ? '' : `<input type="checkbox" class="tick" ${i.done?'checked':''} onchange="togglePrep(${idx},this.checked)">`;
-    const del = (isWiz || i.source === '自定义') ? `<button class="del" onclick="delPrep(${idx})">🗑</button>` : '';
-    return `<div class="row ${i.done?'done':''}">${doneCb}
-      <div class="grow"><div class="name">${esc(i.name)}</div>
-      <div class="hint">${i.users} · ${prepTag}</div></div>
-      <div class="stepper"><button onclick="stepQty(${idx},-1)">−</button><b>${i.qty}</b><button onclick="stepQty(${idx},1)">＋</button><span class="hint">${esc(i.unit)}</span></div>${del}</div>`;
-  }).join('') + '</div>').join('');
-}
-
-function renderStay() {
-  const s = stay(); if (!s) { view = 'home'; return renderHome(); }
-  const items = sortItems([...s.prep, ...s.custom]);
-  const all = items.length, done = countDone(items);
-  const tabs = `<div class="tabs">
-    <button class="${tab==='prep'?'on':''}" onclick="tab='prep';render()">🧳 准备</button>
-    <button class="${tab==='checkin'?'on':''}" onclick="tab='checkin';render()">🛏️ 入住</button>
-    <button class="${tab==='checkout'?'on':''}" onclick="tab='checkout';render()">🚪 退房</button></div>`;
-  let body = '';
-  if (tab === 'prep') {
-    body = `<div class="progtext">${done}/${all} 已备齐</div><div class="prog"><i style="width:${pct(done,all)}%"></i></div>`
-      + renderPrepList(items, false)
-      + `<div class="card"><div style="display:flex;gap:8px">
-          <input type="text" id="cName" placeholder="添加我的必带物品" style="flex:1">
-          <input type="number" id="cQty" value="1" min="1" style="width:64px" title="数量">
-          <button class="btn small" onclick="stayAddCustom()">＋</button></div>
-          ${CUSTOM_HINTS.map(h=>`<div class="hint">${h.icon} ${h.text}</div>`).join('')}</div>`;
-  } else {
-    const key = tab; const cl = CHECKLISTS[key];
-    const flat = cl.groups.reduce((n,g)=>n+g.items.length,0);
-    const dn = s[key].reduce((n,g)=>n+g.filter(Boolean).length,0);
-    body = `<div class="progtext">${dn}/${flat} 已完成</div><div class="prog"><i style="width:${pct(dn,flat)}%"></i></div>`
-      + cl.groups.map((g,gi)=>`<h2>${g.risk} ${g.name}</h2><div class="card">` + g.items.map((t,ii)=>
-        `<div class="row ${s[key][gi][ii]?'done':''}"><input type="checkbox" class="tick" ${s[key][gi][ii]?'checked':''} onchange="toggleCheck('${key}',${gi},${ii},this.checked)">
-         <div class="grow name">${t}</div></div>`).join('') + '</div>').join('');
+function qtyStep(idx, d, el) {
+  let it;
+  if (view === 'wizard') { it = wiz.preview[idx]; it.qty = Math.max(1, it.qty + d); }
+  else {
+    const s = stay();
+    it = sortItems([...s.prep, ...s.custom])[idx];
+    it.qty = Math.max(1, it.qty + d); saveStay(s);
   }
-  return `<div class="hint"><a href="#" onclick="go('home');return false">← 返回</a>　${esc(s.date||'未填日期')} · ${s.nights} 晚 · ${esc(s.conditions.purpose)}</div>` + tabs + body
-    + `<button class="btn plain" onclick="delStayUI()">删除这次入住</button>`;
+  el.closest('.stepper').querySelector('.qty-val').textContent = it.qty;
 }
-function togglePrep(idx, v) { const s = stay(); const items = sortItems([...s.prep, ...s.custom]); items[idx].done = v; persistSorted(items); }
-function stepQty(idx, d) { const s = stay(); const items = sortItems([...s.prep, ...s.custom]); items[idx].qty = Math.max(1, items[idx].qty + d); persistSorted(items); }
-function delPrep(idx) { const s = stay(); const items = sortItems([...s.prep, ...s.custom]); const it = items[idx]; s.prep = s.prep.filter(x=>x!==it); s.custom = s.custom.filter(x=>x!==it); saveStay(s); render(); }
-function persistSorted(items) {
+function delItem(idx) {
+  if (view === 'wizard') { wiz.preview.splice(idx, 1); render(); return; }
   const s = stay();
-  s.prep = items.filter(i => i.source !== '自定义').map(i => { delete i.doneRef; return i; });
-  s.custom = items.filter(i => i.source === '自定义');
+  const it = sortItems([...s.prep, ...s.custom])[idx];
+  s.prep = s.prep.filter(x => x !== it); s.custom = s.custom.filter(x => x !== it);
   saveStay(s); render();
 }
 function stayAddCustom() {
-  const s = stay();
-  const name = document.getElementById('cName').value.trim();
+  const name = document.getElementById('s-cname').value.trim();
   if (!name) return;
-  s.custom.push({ name, cat: '自定义', unit: '件', prep: '自定义', source: '自定义', users: '共用', qty: +document.getElementById('cQty').value || 1, done: false });
-  saveStay(s); render();
+  stay().custom.push({ name, cat: '自定义', unit: '件', prep: '自定义', source: '自定义', users: '共用',
+    qty: +document.getElementById('s-cqty').value || 1, done: false });
+  saveStay(stay()); render();
 }
-function toggleCheck(key, gi, ii, v) { const s = stay(); s[key][gi][ii] = v; saveStay(s); render(); }
 function delStayUI() { if (confirm('删除这次入住的所有记录？')) { deleteStay(currentStayId); go('home'); } }
+
+const progHTML = (done, all, label) =>
+  `<div class="prog"><i style="width:${pct(done, all)}%"></i></div><div class="progtext"><b>${done}</b> / ${all} ${label}</div>`;
+function progBoxHTML() {
+  if (tab === 'prep') { const items = stayItems(); return progHTML(countDone(items), items.length, '已备齐'); }
+  const cl = CHECKLISTS[tab], s = stay();
+  const flat = cl.groups.reduce((n, g) => n + g.items.length, 0);
+  const dn = s[tab].reduce((n, g) => n + g.filter(Boolean).length, 0);
+  return progHTML(dn, flat, '已完成');
+}
+function updateProg() { const b = document.getElementById('progbox'); if (b) b.innerHTML = progBoxHTML(); }
+
+function renderStay() {
+  const s = stay(); if (!s) { view = 'home'; return renderHome(); }
+  const tabs = `<div class="tabs">
+    <button class="${tab === 'prep' ? 'on' : ''}" data-act="tab" data-v="prep">🧳 准备</button>
+    <button class="${tab === 'checkin' ? 'on' : ''}" data-act="tab" data-v="checkin">🛏️ 入住</button>
+    <button class="${tab === 'checkout' ? 'on' : ''}" data-act="tab" data-v="checkout">🚪 退房</button></div>`;
+  let body = '';
+  if (tab === 'prep') {
+    const items = stayItems();
+    const cats = [...new Set(items.map(i => i.cat))].sort((a, b) => CAT_ORDER.indexOf(a) - CAT_ORDER.indexOf(b));
+    body = cats.map(cat => `<h2>${cat}</h2><div class="card">` + items.map((it, idx) => ({ it, idx }))
+      .filter(x => x.it.cat === cat).map(({ it, idx }) =>
+        `<div class="row ${it.done ? 'done' : ''}">
+          <input type="checkbox" class="tick" data-act="prep-toggle" data-idx="${idx}" ${it.done ? 'checked' : ''}>
+          <div class="grow"><div class="name">${esc(it.name)}</div>
+            <div class="meta">${it.users} · <span class="tag ${TAG_CLS[it.prep] || ''}">${it.prep}</span></div></div>
+          <div class="stepper"><button class="st" data-act="qty" data-idx="${idx}" data-d="-1">−</button><b class="qty-val">${it.qty}</b><button class="st" data-act="qty" data-idx="${idx}" data-d="1">＋</button><span class="unit">${esc(it.unit)}</span></div>
+          ${it.source === '自定义' ? `<button class="del" data-act="del-item" data-idx="${idx}">✕</button>` : ''}</div>`).join('') + '</div>').join('');
+    body += `<div class="card pad"><b>🧠 想想还有什么要带的</b>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input type="text" id="s-cname" placeholder="添加我的必带物品" style="flex:1">
+        <input type="number" id="s-cqty" value="1" min="1" style="width:64px" title="数量">
+        <button class="btn small" data-act="stay-add">＋</button></div>
+      ${CUSTOM_HINTS.map(h => `<div class="muted" style="margin-top:6px">${h.icon} ${h.text}</div>`).join('')}</div>`;
+  } else {
+    const cl = CHECKLISTS[tab], s = stay();
+    body = cl.groups.map((g, gi) => `<h2>${g.risk} ${g.name}</h2><div class="card">` + g.items.map((t, ii) =>
+      `<div class="row ${s[tab][gi][ii] ? 'done' : ''}">
+        <input type="checkbox" class="tick" data-act="check-toggle" data-key="${tab}" data-gi="${gi}" data-ii="${ii}" ${s[tab][gi][ii] ? 'checked' : ''}>
+        <div class="grow name">${t}</div></div>`).join('') + '</div>').join('');
+  }
+  return `<a href="#" class="backlink" onclick="go('home');return false">← 返回</a>
+    <div class="q" style="margin-top:8px">${esc(s.date || '未填日期')} · ${s.nights} 晚 <small>${esc(s.conditions.purpose || '普通短住')}</small></div>`
+    + tabs + `<div id="progbox">${progBoxHTML()}</div>` + body
+    + `<button class="btn plain" data-act="del-stay">🗑 删除这次入住</button>`;
+}
 
 // ---------- 知识库 ----------
 function renderKnow() {
   const mods = [...new Set(KNOWLEDGE.map(k => k.module))];
-  return `<div class="hint">证据等级：🔵 官方法规 · 🟢 官方建议 · 🟡 专业机构 · ⚪ 个人经验　|　风险：🟢 注意 · 🟡 建议检查 · 🔴 立即处理</div>`
+  return `<div class="legend">证据等级：🔵 官方法规 · 🟢 官方建议 · 🟡 专业机构 · ⚪ 个人经验　｜　风险：🟢 注意 · 🟡 建议检查 · 🔴 立即处理</div>`
     + mods.map(m => `<h2>${m}</h2><div class="card">` + KNOWLEDGE.filter(k => k.module === m).map(k =>
       `<details><summary>${k.risk} ${esc(k.title)}</summary>
-       <div class="body">${k.body}</div><div class="src">证据：${k.evidence}　来源：${esc(k.source)}　·　核查于 ${k.updated}</div></details>`).join('') + '</div>').join('');
+        <div class="body">${k.body}</div>
+        <div class="src">证据 ${k.evidence} ｜ 来源：${esc(k.source)} ｜ 核查于 ${k.updated}</div></details>`).join('') + '</div>').join('');
 }
 
-// ---------- 渲染 ----------
-function render() {
-  const app = document.getElementById('app');
-  app.innerHTML = view === 'home' ? renderHome()
-    : view === 'wizard' ? renderWizard()
-    : view === 'stay' ? renderStay()
-    : renderKnow();
-  document.getElementById('navHome').className = (view === 'home' || view === 'wizard' || view === 'stay') ? 'on' : '';
-  document.getElementById('navKnow').className = view === 'know' ? 'on' : '';
-  window.scrollTo(0, 0);
-}
 render();
 </script>
 </body>
