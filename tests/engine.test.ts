@@ -1,7 +1,7 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
 import { describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
-import { buildPrep, getStay, listStays, newStay, saveStay } from '../src/engine';
+import { buildPrep, exportData, getStay, importData, listGear, listStays, newStay, resetGear, saveGear, saveStay } from '../src/engine';
 import type { Conditions, PrepItem } from '../src/types';
 
 const base: Conditions = {
@@ -77,9 +77,24 @@ describe('数据完整性', () => {
     // 官方三项观察之三：应急物资必须出现
     expect(CHECKLISTS.checkin.groups[0].items.some(i => i.includes('呼吸面罩'))).toBe(true);
   });
-  it('知识条目 43 条且都带来源/等级', () => {
-    expect(KNOWLEDGE.length).toBe(43);
+  it('知识条目 44 条且都带来源/等级', () => {
+    expect(KNOWLEDGE.length).toBe(44);
     expect(KNOWLEDGE.every(k => k.source && k.updated && k.evidence && k.risk)).toBe(true);
+    expect(KNOWLEDGE[0].module).toBe('使用说明');
+    expect(KNOWLEDGE[1].module).toBe('紧急联络');
+  });
+  it('正文不含方案 §7 禁用的绝对化用语（引用否定语境白名单除外）', () => {
+    const banned = ['绝对不要', '坚决不用', '千万别', '无脑', '必用', '万能', '百分百', '根治', '神物', '硬核'];
+    const allow = ['「一定有反光亮点」是错的', '「禁令」多属酒店住宿须知'];
+    const violations: string[] = [];
+    for (const k of KNOWLEDGE) {
+      for (const line of k.body.split('\n')) {
+        for (const w of banned) {
+          if (line.includes(w) && !allow.some(a => line.includes(a))) violations.push(`${k.id}: ${line.slice(0, 40)}`);
+        }
+      }
+    }
+    expect(violations).toEqual([]);
   });
   it('臭虫判据不使用被核查否定的「黑色小点=粪便」表述', () => {
     const k6 = KNOWLEDGE.find(k => k.id === 'k6')!;
@@ -106,5 +121,28 @@ describe('行程存取', () => {
     const stay = newStay(base, prep);
     prep[0].done = true;
     expect(stay.prep[0].done).toBe(false);
+  });
+});
+
+describe('好物收藏存储', () => {
+  it('saveGear 覆盖种子，resetGear 恢复默认', () => {
+    const itemId = 'towel';
+    expect(listGear(itemId).some(g => g.name.includes('压缩毛巾'))).toBe(true);
+    saveGear(itemId, [{ name: '自用款' }]);
+    expect(listGear(itemId)).toEqual([{ name: '自用款' }]);
+    resetGear(itemId);
+    expect(listGear(itemId).some(g => g.name.includes('压缩毛巾'))).toBe(true);
+  });
+});
+
+describe('数据备份', () => {
+  it('导出再导入，行程与好物一致', () => {
+    saveStay(newStay(base, buildPrep(base)));
+    const json = exportData();
+    const parsed = JSON.parse(json);
+    expect(parsed.app).toBe('hotel-toolbox');
+    const r = importData(json);
+    expect(r.stays).toBe(listStays().length);
+    expect(() => importData('{"app":"other"}')).toThrow();
   });
 });

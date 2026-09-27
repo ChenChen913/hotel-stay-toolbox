@@ -60,6 +60,8 @@ export interface CheckGroup {
   risk: RiskLevel;
   /** 组级说明（如「60 秒为时间约束，非官方术语」） */
   note?: string;
+  /** 对应知识库模块名，检查组标题旁出「知识详解」链接 */
+  link?: string;
   items: string[];
 }
 
@@ -81,6 +83,8 @@ export interface KnowledgeEntry {
   updated: string;
   /** 紧急话术等可一键复制的内容 */
   copy?: string;
+  /** 法规时效性强条目的建议复核时间（YYYY-MM），到期在知识库提示 */
+  reviewBy?: string;
 }
 
 export interface CustomHint {
