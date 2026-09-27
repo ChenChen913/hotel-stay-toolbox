@@ -3,9 +3,11 @@ import { ref } from 'vue';
 import type { Stage, Stay } from './types';
 import { deleteStay as engineDelete, getStay, saveStay } from './engine';
 
-export const view = ref<'home' | 'wizard' | 'stay' | 'know'>('home');
+export const view = ref<'home' | 'wizard' | 'stay' | 'know' | 'gear'>('home');
 export const stage = ref<Stage>('prep');
 export const currentStay = ref<Stay | null>(null);
+/** 知识库锚点：指定模块名时，知识库打开后滚动到该模块并展开 */
+export const knowModule = ref<string | null>(null);
 
 export function scrollTop() { window.scrollTo({ top: 0 }); }
 
@@ -42,8 +44,15 @@ export function openStay(id: string) {
   scrollTop();
 }
 export function goHome() { view.value = 'home'; scrollTop(); }
-export function goKnowledge() { view.value = 'know'; scrollTop(); }
+export function goKnowledge() { knowModule.value = null; view.value = 'know'; scrollTop(); }
 export function goWizard() { view.value = 'wizard'; scrollTop(); }
+export function goGear() { view.value = 'gear'; scrollTop(); }
+/** 打开知识库并定位到指定模块（紧急入口、检查组互链共用） */
+export function goKnowledgeModule(module: string) {
+  knowModule.value = module;
+  view.value = 'know';
+  scrollTop();
+}
 export function persist() { if (currentStay.value) saveStay(currentStay.value); }
 export function removeCurrentStay() {
   if (currentStay.value) engineDelete(currentStay.value.id);

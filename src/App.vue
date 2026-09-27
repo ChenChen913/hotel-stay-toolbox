@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { BookOpen, House } from 'lucide-vue-next';
-import { goHome, goKnowledge, view } from './store';
+import { BookOpen, House, Luggage } from 'lucide-vue-next';
+import { goGear, goHome, goKnowledge, view } from './store';
 import HomeView from './components/HomeView.vue';
 import WizardView from './components/WizardView.vue';
 import StayView from './components/StayView.vue';
+import GearView from './components/GearView.vue';
 import KnowledgeView from './components/KnowledgeView.vue';
 
-const VIEWS = { home: HomeView, wizard: WizardView, stay: StayView, know: KnowledgeView } as const;
+const VIEWS = { home: HomeView, wizard: WizardView, stay: StayView, know: KnowledgeView, gear: GearView } as const;
 </script>
 
 <template>
@@ -15,8 +16,9 @@ const VIEWS = { home: HomeView, wizard: WizardView, stay: StayView, know: Knowle
   </main>
 
   <nav class="navbar glass">
-    <button :class="{ on: view !== 'know' }" @click="goHome()"><House :size="18" :stroke-width="1.9" />首页</button>
-    <button :class="{ on: view === 'know' }" @click="goKnowledge()"><BookOpen :size="18" :stroke-width="1.9" />知识库</button>
+    <button :class="{ on: view === 'home' || view === 'wizard' || view === 'stay' }" data-nav="home" @click="goHome()"><House :size="18" :stroke-width="1.9" />首页</button>
+    <button :class="{ on: view === 'gear' }" data-nav="gear" @click="goGear()"><Luggage :size="18" :stroke-width="1.9" />好物</button>
+    <button :class="{ on: view === 'know' }" data-nav="know" @click="goKnowledge()"><BookOpen :size="18" :stroke-width="1.9" />知识库</button>
   </nav>
 </template>
 

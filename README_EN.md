@@ -55,7 +55,7 @@ The main flow has five steps:
 2. The app generates a packing list from 36 item rules; quantities are derived from guests and nights, and each item is tagged as "must bring / buy / bring from home"
 3. Check items off, adjust quantities, or add custom items (camera, medication, etc.)
 4. At the hotel, run the 15-item check-in check (fire observations and emergency supplies included); before leaving, run the 14-item checkout check
-5. The knowledge section holds 43 entries with evidence levels and sources across pre-trip, fire safety, privacy, hygiene, consumer rights and special scenarios, with a disclaimer up top and one-tap copy for emergency phrasing
+5. The knowledge section holds 44 entries with evidence levels and sources across pre-trip, fire safety, privacy, hygiene, consumer rights and special scenarios, with a disclaimer up top, one-tap copy for emergency phrasing, a quick emergency button on the stay page and review reminders on time-sensitive law entries
 
 Stays are stored in the browser. The home page can duplicate the last stay as a template.
 
@@ -107,7 +107,7 @@ A: The design settles on fixed rules: they are explainable, testable and work of
 
 ## Known limitations
 
-- Stay data lives in browser localStorage: clearing browser data deletes it, and there is no cross-device sync
+- Stay data lives in browser localStorage: clearing browser data deletes it. Use the backup/export card on the home page to save a JSON backup and import it back
 - Season is not inferred automatically; users tick "mosquito season" in the questionnaire. Destination weather is not integrated
 - Quantity formulas are simplified rules (guests × (nights + 1)); adjust manually in the list
 

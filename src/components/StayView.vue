@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { ArrowLeft, BedDouble, Briefcase, ChevronRight, DoorOpen, Plus, Trash2 } from 'lucide-vue-next';
+import { ArrowLeft, BedDouble, Briefcase, ChevronRight, DoorOpen, Plus, Siren, Trash2 } from 'lucide-vue-next';
 import { CAT_ORDER, CUSTOM_HINTS } from '../data';
 import { sortItems } from '../engine';
 import type { PrepItem } from '../types';
-import { currentStay, fmtDate, goHome, persist, removeCurrentStay, stage } from '../store';
+import { currentStay, fmtDate, goHome, goKnowledgeModule, persist, removeCurrentStay, stage } from '../store';
 import ItemRow from './ItemRow.vue';
 import ProgressPill from './ProgressPill.vue';
 import CheckStage from './CheckStage.vue';
@@ -64,6 +64,7 @@ const fmtStay = () => fmtDate(stay().date);
       <div class="st-date display num">{{ fmtStay() }} · {{ stay().nights }} 晚</div>
       <div class="muted">{{ stay().conditions.purpose }} · {{ stageHint }}</div>
     </div>
+    <button class="emerg" @click="goKnowledgeModule('紧急联络')"><Siren :size="14" />紧急</button>
   </header>
 
   <div class="seg">
@@ -107,6 +108,13 @@ const fmtStay = () => fmtDate(stay().date);
 <style scoped>
 .st-head { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; }
 .st-date { font-size: 20px; font-weight: 650; }
+.emerg {
+  display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+  min-height: 34px; padding: 4px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(178, 58, 50, 0.35); background: rgba(178, 58, 50, 0.08); color: var(--red);
+  font-size: 13px; font-weight: 650;
+}
+.emerg:active { background: rgba(178, 58, 50, 0.18); }
 .card { padding: 4px 18px; margin-bottom: 12px; }
 .think { padding: 16px 18px; margin-top: 14px; }
 .think-title { font-weight: 650; font-size: 15px; margin-bottom: 4px; }

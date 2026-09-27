@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { currentStay, persist } from '../store';
+import { ChevronRight } from 'lucide-vue-next';
+import { currentStay, goKnowledgeModule, persist } from '../store';
 import { CHECKLISTS } from '../data';
 import CheckGroupBlock from './CheckGroupBlock.vue';
 import ProgressPill from './ProgressPill.vue';
@@ -28,7 +29,10 @@ function set(gi: number, ii: number, v: boolean) {
 <template>
   <ProgressPill :done="doneCount()" :total="totalCount()" label="已完成" />
   <template v-for="(g, gi) in checklist.groups" :key="g.name">
-    <div class="sec-label"><span class="dot" :class="RISK_TONE[g.risk]"></span>{{ g.name }}</div>
+    <div class="sec-label">
+      <span class="dot" :class="RISK_TONE[g.risk]"></span>{{ g.name }}
+      <button v-if="g.link" class="glink" @click="goKnowledgeModule(g.link)">知识详解<ChevronRight :size="12" /></button>
+    </div>
     <p v-if="g.note" class="gnote">{{ g.note }}</p>
     <div class="glass card">
       <CheckGroupBlock :items="g.items" :states="stay()[stage][gi]" @set="(ii: number, v: boolean) => set(gi, ii, v)" />
@@ -40,4 +44,9 @@ function set(gi: number, ii: number, v: boolean) {
 .card { padding: 4px 18px; }
 .sec-label .dot { flex-shrink: 0; }
 .gnote { margin: -4px 4px 8px; font-size: 12.5px; color: var(--ink-2); }
+.glink {
+  display: inline-flex; align-items: center; gap: 1px;
+  border: 0; background: none; cursor: pointer; padding: 0;
+  font-size: 11.5px; letter-spacing: 0.05em; color: var(--pine-deep); font-family: var(--sans);
+}
 </style>
