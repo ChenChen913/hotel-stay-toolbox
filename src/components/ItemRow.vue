@@ -39,14 +39,16 @@ function onAssign(e: Event) {
 </script>
 
 <template>
-  <div class="row" :class="{ done: props.item.done }">
+  <div class="row" :class="{ done: props.item.done, zero: props.item.qty === 0 }">
     <input v-if="props.editable" type="checkbox" class="tick" :checked="props.item.done"
+           :disabled="props.item.qty === 0"
            @change="emit('toggle', ($event.target as HTMLInputElement).checked)">
     <div class="grow">
       <div class="name">{{ props.item.name }}</div>
       <div class="meta">
         <span>{{ props.item.users }}</span>
-        <span class="tag" :class="tagCls">{{ props.item.prep }}</span>
+        <span v-if="props.item.qty === 0" class="tag zero">不带</span>
+        <span v-else class="tag" :class="tagCls">{{ props.item.prep }}</span>
         <select v-if="assignOptions && props.editable" class="assign" :value="props.item.assign ?? assignOptions[0]" @change="onAssign">
           <option v-for="o in assignOptions" :key="o" :value="o">{{ o }}</option>
         </select>
@@ -55,7 +57,7 @@ function onAssign(e: Event) {
         </button>
       </div>
     </div>
-    <Stepper :model-value="props.item.qty" :min="1" :unit="props.item.unit" @update:model-value="onQty" />
+    <Stepper :model-value="props.item.qty" :min="0" :unit="props.item.unit" @update:model-value="onQty" />
     <button v-if="props.removable" class="del" aria-label="删除" @click="emit('remove')"><Trash2 :size="16" /></button>
 
     <GearPanel v-if="showGear && props.item.itemId" :item-id="props.item.itemId" @change="onGearChange" />
@@ -63,6 +65,8 @@ function onAssign(e: Event) {
 </template>
 
 <style scoped>
+.row.zero .name { opacity: 0.5; }
+.tick:disabled { opacity: 0.35; cursor: not-allowed; }
 .del { border: 0; background: none; color: var(--ink-3); padding: 6px 2px; cursor: pointer; }
 .del:active { color: var(--red); }
 .meta { display: flex; align-items: center; gap: 7px; margin-top: 3px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }

@@ -6,6 +6,7 @@ import { sortItems } from '../engine';
 import type { PrepItem } from '../types';
 import { currentStay, fmtDate, goHome, goKnowledgeModule, persist, removeCurrentStay, stage } from '../store';
 import ItemRow from './ItemRow.vue';
+import ClothingAdd from './ClothingAdd.vue';
 import ProgressPill from './ProgressPill.vue';
 import CheckStage from './CheckStage.vue';
 import { HINT_ICON_MAP } from '../hint-icons';
@@ -41,6 +42,11 @@ function removeItem(item: PrepItem) {
   const s = stay();
   s.prep = s.prep.filter(x => x !== item);
   s.custom = s.custom.filter(x => x !== item);
+  persist();
+}
+function addClothing(name: string) {
+  if (stay().prep.some(i => i.cat === '衣物' && i.name === name) || stay().custom.some(i => i.name === name)) return;
+  stay().custom.push({ name, cat: '衣物', unit: '件', prep: '家里带', source: '自定义', users: '每人', qty: 1, done: false });
   persist();
 }
 const customName = ref('');
@@ -81,6 +87,7 @@ const fmtStay = () => fmtDate(stay().date);
       <div class="glass card">
         <ItemRow v-for="it in g.items" :key="it.name" :item="it" :assign-options="assignOptions ?? undefined"
                  @toggle="(v: boolean) => { it.done = v; persist(); }" @remove="removeItem(it)" :removable="it.source === '自定义'" />
+        <ClothingAdd v-if="g.cat === '衣物'" @add="addClothing" />
       </div>
     </template>
     <div class="glass card think">

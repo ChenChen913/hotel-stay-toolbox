@@ -7,6 +7,7 @@ import { openStay } from '../store';
 import Stepper from './Stepper.vue';
 import Toggle from './Toggle.vue';
 import ItemRow from './ItemRow.vue';
+import ClothingAdd from './ClothingAdd.vue';
 
 const HINT_ICONS: Record<string, typeof Briefcase> = { briefcase: Briefcase, camera: Camera, pill: Pill, baby: Baby, 'paw-print': PawPrint };
 const HINTS: { icon: string; text: string }[] = [
@@ -46,6 +47,10 @@ function addCustom() {
 function removeCustom(item: PrepItem) {
   const i = preview.value.indexOf(item);
   if (i >= 0) preview.value.splice(i, 1);
+}
+function addClothing(name: string) {
+  if (preview.value.some(i => i.cat === '衣物' && i.name === name)) return;
+  preview.value.push({ name, cat: '衣物', unit: '件', prep: '家里带', source: '自定义', users: '每人', qty: 1, done: false });
 }
 function next() {
   if (step.value === 5) preview.value = sortItems(buildPrep(draft));
@@ -142,6 +147,7 @@ function save() {
       <div class="sec-label">{{ cat }}</div>
       <div class="glass card">
         <ItemRow v-for="it in preview.filter(i => i.cat === cat)" :key="it.name" :item="it" :editable="false" :removable="it.source === '自定义'" @remove="removeCustom(it)" />
+        <ClothingAdd v-if="cat === '衣物'" @add="addClothing" />
       </div>
     </template>
     <div class="glass card think">

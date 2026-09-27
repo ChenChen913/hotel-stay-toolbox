@@ -57,6 +57,13 @@ export const ITEMS: ItemDef[] = [
   { id: 'laundry',     name: '洗衣片/便携洗衣液', cat: '长住', users: 'shared', prep: '建议购买', unit: '份', when: c => c.nights >= 4 },
   { id: 'drying_rack', name: '折叠晾衣架', cat: '长住', users: 'shared', prep: '家里带',   unit: '个', when: c => c.nights >= 4 },
 
+  // —— 出行/生活补充（原指南 A12/A13/A28/N9.1）——
+  { id: 'umbrella',   name: '折叠伞', cat: '出行', users: 'adult',  prep: '可选',     unit: '把', when: () => true },
+  { id: 'cup',        name: '折叠漱口杯', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
+  { id: 'cutlery',    name: '便携餐具', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '套', when: () => true },
+  { id: 'lint_roller',name: '粘毛器', cat: '卫生', users: 'shared', prep: '可选',     unit: '个', when: () => true },
+  { id: 'cash',       name: '小额现金（断网断电备用）', cat: '证件', users: 'adult', prep: '推荐', unit: '份', when: () => true },
+
   // —— 到店购买（抵达后本地补给）——
   { id: 'bottled_water', name: '大桶矿泉水（烧水/刷牙）', cat: '补给', users: 'shared', prep: '到店购买', unit: '桶', when: () => true },
   { id: 'tissue',        name: '抽纸/湿厕纸', cat: '补给', users: 'shared', prep: '到店购买', unit: '包', when: () => true },
@@ -68,7 +75,7 @@ export function defaultQty(item: ItemDef, c: Conditions): number {
   return item.users === 'adult' ? c.adults : item.users === 'child' ? c.children : 1;
 }
 
-export const CAT_ORDER = ['证件', '洗漱', '衣物', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
+export const CAT_ORDER = ['证件', '洗漱', '衣物', '出行', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
 
 // —— 好物收藏（只记品牌；⚪ 个人偏好，非商业推荐；默认为空，用户自行添加）——
 // 仅保留两组作为测试数据
