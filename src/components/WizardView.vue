@@ -3,7 +3,7 @@ import { computed, reactive, ref } from 'vue';
 import { ArrowLeft, Baby, Bug, CalendarDays, Camera, ChevronRight, Compass, Droplets, Moon, PawPrint, Pill, Plug, Plus, SlidersHorizontal, Users, Briefcase } from 'lucide-vue-next';
 import { buildPrep, newStay, saveStay, sortItems } from '../engine';
 import type { ChildAge, Conditions, PrepItem, Purpose } from '../types';
-import { openStay } from '../store';
+import { fmtDate, openStay } from '../store';
 import Stepper from './Stepper.vue';
 import Toggle from './Toggle.vue';
 import ItemRow from './ItemRow.vue';
@@ -19,6 +19,10 @@ const HINTS: { icon: string; text: string }[] = [
 ];
 
 const step = ref(1);
+const customDate = ref(false);
+const dstr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function setOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); draft.date = dstr(d); customDate.value = false; }
+function isOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); return draft.date === dstr(d); }
 const TOTAL = 6;
 
 function defaultDraft(): Conditions {
@@ -76,10 +80,16 @@ function save() {
   <template v-if="step === 1">
     <h2 class="q">什么时候入住？</h2>
     <div class="glass card">
-      <label class="fl"><CalendarDays :size="16" />入住日期</label>
-      <input v-model="draft.date" type="date" class="field">
-      <label class="fl" style="margin-top:18px"><Compass :size="16" />住几晚</label>
-      <div class="nights">
+      <div class="datebig num">{{ draft.date ? fmtDate(draft.date) : '先选好日子' }}</div>
+      <div class="quickrow">
+        <button type="button" class="qchip" :class="{ on: isOffset(0) }" @click="setOffset(0)">今天</button>
+        <button type="button" class="qchip" :class="{ on: isOffset(1) }" @click="setOffset(1)">明天</button>
+        <button type="button" class="qchip" :class="{ on: isOffset(2) }" @click="setOffset(2)">后天</button>
+        <button type="button" class="qchip" :class="{ on: isOffset(-1) }" @click="customDate = true">自选日期</button>
+      </div>
+      <input v-if="customDate" v-model="draft.date" type="date" class="field datefield">
+      <div class="nightsrow">
+        <span class="fl"><Compass :size="16" />住几晚</span>
         <Stepper v-model="draft.nights" :min="1" :max="30" unit="晚" />
       </div>
       <p class="muted hint">晚数 ≥ 4 会自动加入长住物品（洗衣、晾衣）。</p>
@@ -180,6 +190,16 @@ function save() {
 .q small { display: block; font-size: 13px; color: var(--ink-2); font-weight: 400; margin-top: 5px; font-family: var(--sans); letter-spacing: 0; }
 .card { padding: 18px; }
 .fl { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2); margin-bottom: 9px; }
+.datebig { font-size: 21px; font-weight: 700; color: var(--pine-deep); margin-bottom: 12px; }
+.quickrow { display: flex; gap: 8px; margin: 12px 0 12px; }
+.qchip {
+  flex: 1; min-height: 40px; border-radius: 11px; cursor: pointer;
+  border: 1.5px solid var(--glass-border); background: rgba(255, 255, 255, 0.6);
+  font-size: 14.5px; color: var(--ink); transition: all 0.15s;
+}
+.qchip.on { border-color: var(--pine); background: rgba(28, 90, 74, 0.1); color: var(--pine-deep); font-weight: 650; }
+.datefield { margin-top: 12px; }
+.nightsrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .hint { margin: 12px 0 0; }
 .nights { display: flex; align-items: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 10px; }
