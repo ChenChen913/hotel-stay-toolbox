@@ -13,6 +13,7 @@ export const ITEMS: ItemDef[] = [
   { id: 'slippers',   name: '拖鞋',          cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '双', when: () => true },
   { id: 'toilet_seat',name: '一次性马桶垫', cat: '卫生', users: 'adult',  prep: '建议购买', unit: '片', qty: c => c.adults * (c.nights + 1), when: () => true },
   { id: 'wet_wipes',  name: '湿巾/酒精湿巾', cat: '卫生', users: 'shared', prep: '建议购买', unit: '包', when: () => true },
+  { id: 'flashlight', name: '小型手电筒', cat: '安全', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
   { id: 'door_stop',  name: '阻门器/顶门器', cat: '安全', users: 'shared', prep: '建议购买', unit: '个', when: () => true,
     gear: [{ name: '阻门器（通用款）', note: '有效的额外防护，但不能替代反锁与门链' }] },
 
@@ -80,6 +81,7 @@ export const CAT_ORDER = ['证件', '洗漱', '衣物', '出行', '卫生', '睡
 // —— 好物收藏（只记品牌；⚪ 个人偏好，非商业推荐；默认为空，用户自行添加）——
 // 仅保留两组作为测试数据
 export const GEAR_SEED: Record<string, string[]> = {
+  flashlight: ['小型可充电手电筒'],
   earplugs:    ['安耳悠'],
   gan_charger: ['摩米士（小魔方）'],
 };

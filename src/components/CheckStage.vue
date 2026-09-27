@@ -31,7 +31,7 @@ function set(gi: number, ii: number, v: boolean) {
   <template v-for="(g, gi) in checklist.groups" :key="g.name">
     <div class="sec-label">
       <span class="dot" :class="RISK_TONE[g.risk]"></span>{{ g.name }}
-      <button v-if="g.link" class="glink" @click="goKnowledgeModule(g.link)">知识详解<ChevronRight :size="12" /></button>
+      <button v-if="g.link" class="glink" @click="goKnowledgeModule(g.link, 'stay')">知识详解<ChevronRight :size="12" /></button>
     </div>
     <p v-if="g.note" class="gnote">{{ g.note }}</p>
     <div class="glass card">

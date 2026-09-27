@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
 import { buildPrep, exportData, getStay, importData, listGear, listStays, newStay, saveGear, saveStay } from '../src/engine';
+import { suggestedStage } from '../src/store';
 import type { Conditions, PrepItem } from '../src/types';
 
 const base: Conditions = {
@@ -132,6 +133,23 @@ describe('好物收藏存储', () => {
     expect(listGear('towel')).toEqual(['全棉时代']);
     saveGear('towel', []);
     expect(listGear('towel')).toEqual([]);
+  });
+});
+
+
+describe('按日期自动定位阶段', () => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const dstr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  it('未开始→准备；进行中→入住；已结束→退房；无日期→准备', () => {
+    const mk = (date: string, nights: number): Conditions => ({ ...base, date, nights });
+    expect(suggestedStage(mk('2999-01-01', 3))).toBe('prep');
+    const today = new Date();
+    expect(suggestedStage(mk(dstr(today), 3))).toBe('checkin');
+    expect(suggestedStage(mk(dstr(today), 1))).toBe('checkin');
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    expect(suggestedStage(mk(dstr(yesterday), 1))).toBe('checkout');
+    expect(suggestedStage({ ...mk('', 3), date: '' })).toBe('prep');
   });
 });
 

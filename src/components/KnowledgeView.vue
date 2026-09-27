@@ -2,7 +2,7 @@
 import { nextTick, ref } from 'vue';
 import { AlertTriangle, ChevronRight, Copy, ShieldAlert } from 'lucide-vue-next';
 import { DISCLAIMER, EVIDENCE_META, KNOWLEDGE, RISK_META } from '../data';
-import { knowModule } from '../store';
+import { backToStay, currentStay, knowModule, knowReturnTo } from '../store';
 import { esc } from '../fmt';
 
 const modules = [...new Set(KNOWLEDGE.map(k => k.module))];
@@ -44,6 +44,7 @@ async function copyEntry(k: { id: string; copy?: string }) {
 
 <template>
   <div ref="root">
+    <button v-if="knowReturnTo === 'stay' && currentStay" class="backbtn glass" @click="backToStay()">← 返回行程</button>
     <div class="glass disclaimer">
       <div class="d-title"><ShieldAlert :size="16" class="d-icon" />{{ DISCLAIMER.title }}</div>
       <p v-for="(l, i) in DISCLAIMER.lines" :key="i" class="d-line" v-html="rich(l)"></p>
@@ -87,6 +88,7 @@ async function copyEntry(k: { id: string; copy?: string }) {
 </template>
 
 <style scoped>
+.backbtn { display: inline-flex; align-items: center; width: 100%; min-height: 44px; margin: 8px 0 10px; padding: 0 16px; border-radius: 13px; cursor: pointer; font-size: 14px; color: var(--pine-deep); }
 .disclaimer { padding: 15px 18px; margin-top: 6px; border-color: rgba(169, 133, 61, 0.4); }
 .d-title { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 15px; }
 .d-icon { color: var(--gold); }

@@ -70,7 +70,7 @@ const fmtStay = () => fmtDate(stay().date);
       <div class="st-date num">{{ fmtStay() }} · {{ stay().nights }} 晚</div>
       <div class="muted">{{ stay().conditions.purpose }} · {{ stageHint }}</div>
     </div>
-    <button class="emerg" @click="goKnowledgeModule('紧急联络')"><Siren :size="14" />紧急</button>
+    <button class="emerg" @click="goKnowledgeModule('紧急联络', 'stay')"><Siren :size="14" />紧急</button>
   </header>
 
   <div class="seg">

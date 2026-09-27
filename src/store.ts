@@ -8,11 +8,24 @@ export const stage = ref<Stage>('prep');
 export const currentStay = ref<Stay | null>(null);
 /** 知识库锚点：指定模块名时，知识库打开后滚动到该模块并展开 */
 export const knowModule = ref<string | null>(null);
+export const knowReturnTo = ref<'stay' | null>(null);
+
+function phaseOf(s: Stay): 'future' | 'active' | 'ended' {
+  if (!s.date) return 'future';
+  const [y, m, d] = s.date.split('-').map(Number);
+  const start = new Date(y, m - 1, d);
+  const end = new Date(y, m - 1, d + s.nights - 1);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (today < start) return 'future';
+  if (today <= end) return 'active';
+  return 'ended';
+}
 
 export function scrollTop() { window.scrollTo({ top: 0 }); }
 
 /** 按日期推断当前阶段（聊02 定稿：系统自动把用户带到当前阶段） */
-export function suggestedStage(s: Stay): Stage {
+export function suggestedStage(s: Pick<Stay, 'date' | 'nights'>): Stage {
   if (!s.date) return 'prep';
   const [y, m, d] = s.date.split('-').map(Number);
   const start = new Date(y, m - 1, d);
@@ -37,19 +50,25 @@ export function stayPhaseLabel(s: Stay): string | null {
   return null;
 }
 
-export function openStay(id: string) {
+export function openStay(id: string, afterCreate = false) {
   currentStay.value = getStay(id);
-  stage.value = currentStay.value ? suggestedStage(currentStay.value) : 'prep';
+  // 新建保存后绝不直接跳「退房」（用户预期：打包完成 → 准备或入住）；
+  // 重新打开时按日期自动定位。
+  const phase = currentStay.value ? phaseOf(currentStay.value) : 'future';
+  stage.value = afterCreate ? (phase === 'active' ? 'checkin' : 'prep')
+                            : (currentStay.value ? suggestedStage(currentStay.value) : 'prep');
   view.value = 'stay';
   scrollTop();
 }
-export function goHome() { view.value = 'home'; scrollTop(); }
-export function goKnowledge() { knowModule.value = null; view.value = 'know'; scrollTop(); }
+export function goHome() { knowReturnTo.value = null; view.value = 'home'; scrollTop(); }
+export function goKnowledge() { knowReturnTo.value = null; knowModule.value = null; view.value = 'know'; scrollTop(); }
 export function goWizard() { view.value = 'wizard'; scrollTop(); }
-export function goGear() { view.value = 'gear'; scrollTop(); }
-/** 打开知识库并定位到指定模块（紧急入口、检查组互链共用） */
-export function goKnowledgeModule(module: string) {
+export function goGear() { knowReturnTo.value = null; view.value = 'gear'; scrollTop(); }
+export function backToStay() { knowReturnTo.value = null; view.value = 'stay'; scrollTop(); }
+/** 打开知识库并定位到指定模块（紧急入口、检查组互链共用）；from='stay' 时提供返回键 */
+export function goKnowledgeModule(module: string, from?: 'stay') {
   knowModule.value = module;
+  if (from) knowReturnTo.value = from;
   view.value = 'know';
   scrollTop();
 }
