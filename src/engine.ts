@@ -1,6 +1,6 @@
 // 规则求值 + 行程存储。纯逻辑，不依赖 Vue/DOM；Storage 在 node 中用内存兜底（测试环境）。
 import type { Conditions, PrepItem, Stay } from './types';
-import { CAT_ORDER, CHECKLISTS, ITEMS, defaultQty } from './data';
+import { CAT_ORDER, CHECKLISTS, GEAR_SEED, ITEMS, defaultQty } from './data';
 
 // localStorage 在 node/Vitest 里不存在 → 内存兜底
 interface MiniStorage {
@@ -74,4 +74,30 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
     checkin: CHECKLISTS.checkin.groups.map(g => g.items.map(() => false)),
     checkout: CHECKLISTS.checkout.groups.map(g => g.items.map(() => false)),
   };
+}
+
+// —— 好物收藏：种子来自 data.ts（GEAR_SEED），用户修改以 localStorage 为准 ——
+const GEAR_KEY = 'htb_gear_v1';
+export interface GearPick { name: string; note: string; custom?: boolean }
+
+function gearOverrides(): Record<string, GearPick[]> {
+  return JSON.parse(Storage.getItem(GEAR_KEY) || '{}') as Record<string, GearPick[]>;
+}
+export function listGear(itemId: string): GearPick[] {
+  const override = gearOverrides()[itemId];
+  if (override) return override;
+  return (GEAR_SEED[itemId] || []).map(g => ({ ...g }));
+}
+export function saveGear(itemId: string, list: GearPick[]): void {
+  const o = gearOverrides();
+  o[itemId] = list;
+  Storage.setItem(GEAR_KEY, JSON.stringify(o));
+}
+export function gearIsCustomized(itemId: string): boolean {
+  return itemId in gearOverrides();
+}
+export function resetGear(itemId: string): void {
+  const o = gearOverrides();
+  delete o[itemId];
+  Storage.setItem(GEAR_KEY, JSON.stringify(o));
 }
