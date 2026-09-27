@@ -61,7 +61,7 @@ const fmtStay = () => fmtDate(stay().date);
   <header class="st-head">
     <button class="icon-btn" aria-label="返回" @click="goHome()"><ArrowLeft :size="18" /></button>
     <div class="grow">
-      <div class="st-date display num">{{ fmtStay() }} · {{ stay().nights }} 晚</div>
+      <div class="st-date num">{{ fmtStay() }} · {{ stay().nights }} 晚</div>
       <div class="muted">{{ stay().conditions.purpose }} · {{ stageHint }}</div>
     </div>
     <button class="emerg" @click="goKnowledgeModule('紧急联络')"><Siren :size="14" />紧急</button>

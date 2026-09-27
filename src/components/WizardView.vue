@@ -69,7 +69,7 @@ function save() {
 
   <!-- ① 日期与晚数 -->
   <template v-if="step === 1">
-    <h2 class="q display">什么时候入住？</h2>
+    <h2 class="q">什么时候入住？</h2>
     <div class="glass card">
       <label class="fl"><CalendarDays :size="16" />入住日期</label>
       <input v-model="draft.date" type="date" class="field">
@@ -83,7 +83,7 @@ function save() {
 
   <!-- ② 人数 -->
   <template v-else-if="step === 2">
-    <h2 class="q display">这次有几个人入住？</h2>
+    <h2 class="q">这次有几个人入住？</h2>
     <div class="glass card">
       <div class="chips">
         <button v-for="n in [1, 2, 3]" :key="n" class="chip" :class="{ on: draft.adults === n }" @click="draft.adults = n">
@@ -95,7 +95,7 @@ function save() {
 
   <!-- ③ 同行人员 -->
   <template v-else-if="step === 3">
-    <h2 class="q display">谁和你同行？</h2>
+    <h2 class="q">谁和你同行？</h2>
     <div class="glass card">
       <div class="fl"><Baby :size="16" />儿童</div>
       <div class="nights">
@@ -116,7 +116,7 @@ function save() {
 
   <!-- ④ 场景 -->
   <template v-else-if="step === 4">
-    <h2 class="q display">这次住宿属于哪种情况？</h2>
+    <h2 class="q">这次住宿属于哪种情况？</h2>
     <div class="glass card">
       <div class="chips">
         <button v-for="p in purposes" :key="p" class="chip" :class="{ on: draft.purpose === p }" @click="draft.purpose = p">{{ p }}</button>
@@ -126,7 +126,7 @@ function save() {
 
   <!-- ⑤ 偏好 -->
   <template v-else-if="step === 5">
-    <h2 class="q display">你在意哪些方面？<small class="muted">选中的会加进清单，之后随时可改</small></h2>
+    <h2 class="q">你在意哪些方面？<small class="muted">选中的会加进清单，之后随时可改</small></h2>
     <div class="glass card">
       <div class="srow"><span class="slabel"><Moon :size="16" class="sicon" />睡眠敏感</span><Toggle v-model="draft.prefs.sleep" /></div>
       <div class="srow"><span class="slabel"><Droplets :size="16" class="sicon" />在意卫生</span><Toggle v-model="draft.prefs.hygiene" /></div>
@@ -137,7 +137,7 @@ function save() {
 
   <!-- ⑥ 确认清单 -->
   <template v-else>
-    <h2 class="q display">确认清单<small class="muted">可改数量、可删，保存后也能随时加东西</small></h2>
+    <h2 class="q">确认清单<small class="muted">可改数量、可删，保存后也能随时加东西</small></h2>
     <template v-for="cat in previewCats" :key="cat">
       <div class="sec-label">{{ cat }}</div>
       <div class="glass card">

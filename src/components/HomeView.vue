@@ -56,8 +56,6 @@ const hasStays = computed(() => stays.value.length > 0);
 
 <template>
   <section class="hero glass-deep">
-    <span class="no num">NO. 01</span>
-    <div class="bell"><Bell :size="20" :stroke-width="1.6" /></div>
     <h1 class="display">酒店入住工具箱</h1>
     <p class="tagline">让每一次入住，都少一点遗漏，多一点准备</p>
     <button class="cta" @click="goWizard()">创建一次入住<Plus :size="17" :stroke-width="2.2" /></button>
@@ -76,7 +74,7 @@ const hasStays = computed(() => stays.value.length > 0);
     <article v-for="s in stays" :key="s.id" class="glass staycard" @click="openStay(s.id)">
         <div class="sc-head">
           <div class="grow">
-            <div class="sc-date display num">{{ fmtDate(s.date) }} · {{ s.nights }} 晚</div>
+            <div class="sc-date num">{{ fmtDate(s.date) }} · {{ s.nights }} 晚</div>
             <div class="muted">{{ s.conditions.purpose }}<template v-if="s.conditions.children"> · {{ s.conditions.children }} 个儿童</template><template v-if="s.conditions.elderly"> · 有老人</template></div>
           </div>
           <span v-if="stayPhaseLabel(s)" class="phase">{{ stayPhaseLabel(s) }}</span>
@@ -98,16 +96,9 @@ const hasStays = computed(() => stays.value.length > 0);
 </template>
 
 <style scoped>
-.hero { position: relative; padding: 30px 26px 26px; margin-top: 8px; overflow: hidden; }
-.hero .no { position: absolute; top: 24px; right: 24px; font-size: 12px; letter-spacing: 0.22em; opacity: 0.5; }
-.bell {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 42px; height: 42px; border-radius: 13px; margin-bottom: 14px;
-  border: 1px solid rgba(244, 241, 232, 0.3); color: #e8d9a8;
-  background: rgba(244, 241, 232, 0.08);
-}
-.hero h1 { margin: 0; font-size: 27px; font-weight: 650; }
-.tagline { margin: 8px 0 22px; font-size: 13.5px; opacity: 0.82; }
+.hero { position: relative; padding: 28px 24px 24px; margin-top: 8px; overflow: hidden; }
+.hero h1 { margin: 0; font-size: 25px; font-weight: 700; }
+.tagline { margin: 8px 0 20px; font-size: 13.5px; opacity: 0.85; }
 .cta {
   display: flex; align-items: center; justify-content: center; gap: 7px;
   width: 100%; min-height: 50px; border: 0; border-radius: 15px; cursor: pointer;
