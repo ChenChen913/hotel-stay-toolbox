@@ -80,7 +80,6 @@ function onAssign(e: Event) {
     <button v-if="props.removable" class="del" aria-label="删除" @click="emit('remove')"><Trash2 :size="16" /></button>
 
     <div v-if="showGear" class="gearpanel">
-      <div class="gearhead">好物收藏<span class="gearfoot">个人偏好 · 非商业推荐</span></div>
       <div v-for="(g, i) in gear" :key="g.name + i" class="gearitem">
         <div class="gearinfo">
           <b>{{ g.name }}</b>
@@ -96,6 +95,7 @@ function onAssign(e: Event) {
       <div class="gearactions">
         <button v-if="!adding" class="gaction" @click="adding = true">＋ 添加</button>
         <button v-if="props.item.itemId && gearIsCustomized(props.item.itemId)" class="gaction" @click="restore"><RotateCcw :size="12" />恢复默认</button>
+        <span class="gearfoot">个人偏好 · 非商业推荐</span>
       </div>
     </div>
   </div>
@@ -123,8 +123,7 @@ function onAssign(e: Event) {
   width: 100%; margin-top: 2px; padding: 10px 12px;
   border-radius: 12px; background: rgba(169, 133, 61, 0.07); border: 1px dashed rgba(169, 133, 61, 0.35);
 }
-.gearhead { display: flex; align-items: baseline; justify-content: space-between; font-weight: 650; font-size: 13.5px; margin-bottom: 4px; }
-.gearfoot { font-size: 11px; color: var(--ink-3); font-weight: 400; }
+.gearfoot { margin-left: auto; font-size: 11px; color: var(--ink-3); font-weight: 400; }
 .gearitem { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px dashed var(--hairline); }
 .gearitem:last-of-type { border-bottom: 0; }
 .gearinfo { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
@@ -135,9 +134,10 @@ function onAssign(e: Event) {
 .pickdel:active { color: var(--red); }
 .gearadd { display: flex; gap: 6px; margin-top: 7px; }
 .ginput { flex: 1; min-width: 0; min-height: 32px; padding: 4px 8px; font-size: 12.5px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-.gactions { display: flex; gap: 10px; margin-top: 7px; }
+.gactions { display: flex; align-items: center; gap: 18px; margin-top: 9px; }
 .gaction {
-  display: inline-flex; align-items: center; gap: 4px;
-  border: 0; background: none; color: var(--pine-deep); font-size: 12.5px; cursor: pointer; padding: 2px 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-height: 28px; padding: 2px 4px;
+  border: 0; background: none; color: var(--pine-deep); font-size: 12.5px; cursor: pointer;
 }
 </style>
