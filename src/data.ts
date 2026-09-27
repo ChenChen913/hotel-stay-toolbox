@@ -70,24 +70,24 @@ export function defaultQty(item: ItemDef, c: Conditions): number {
 
 export const CAT_ORDER = ['证件', '洗漱', '衣物', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
 
-// —— 好物收藏（⚪ 个人偏好，非商业推荐；来自原指南与作者自用清单，用户可在应用内增删）——
-export interface GearPick { name: string; note: string; custom?: boolean }
+// —— 好物收藏（只记「名称 + 品牌」两项；⚪ 个人偏好，非商业推荐；用户可在应用内增删）——
+export interface GearPick { name: string; brand?: string }
 export const GEAR_SEED: Record<string, GearPick[]> = {
-  earplugs:    [{ name: '安耳悠（慢回弹）', note: '作者自用耳塞；选慢回弹、降噪值合适的产品即可' }],
-  eye_mask:    [{ name: '3D 立体剪裁眼罩', note: '不压眼球、不蹭妆；全遮光比薄款管用' }],
-  repellent:   [{ name: '含避蚊胺（DEET）或派卡瑞丁成分的驱蚊液', note: '这两类成分有明确驱蚊效果，浓度按说明书使用' }],
-  towel:       [{ name: '压缩毛巾（独立包装）', note: '干净省空间，比酒店毛巾放心' }],
-  slippers:    [{ name: '可折叠防滑底拖鞋', note: '底部有防滑纹，浴室也能穿；折叠后不占行李' }],
-  toilet_seat: [{ name: '独立包装一次性马桶垫', note: '比整卷装卫生，按行程数量买' }],
-  sheets:      [{ name: '隔脏睡袋', note: '减少皮肤与布草直接接触，属个人选择' }],
-  wet_wipes:   [{ name: '75% 酒精消毒湿巾', note: '擦拭开关、遥控器、门把手等高频接触面' }],
-  charger:     [{ name: '2 米长快充线', note: '床头到插座距离长，长线比短线实用' }],
-  powerbank:   [{ name: '大容量双向快充充电宝', note: '注意航空限制（一般 100Wh 内可带上飞机）' }],
-  gan_charger: [{ name: '摩米士小魔方', note: '作者自用；核心看体积与多口功率分配' }],
-  usb_blocker: [{ name: 'USB 数据阻断器（通用款）', note: '阻断数据仅供电；优先自带适配器 + 墙插' }],
-  power_strip: [{ name: '魔方插座', note: '多人多设备不抢插座' }],
-  night_light: [{ name: '感应式小夜灯', note: '夜间起夜自动亮，对老人防摔有帮助' }],
-  laundry:     [{ name: '洗衣片（便携装）', note: '配合水袋或洗手池洗小件衣物' }],
+  earplugs:    [{ name: '慢回弹耳塞', brand: '安耳悠' }],
+  eye_mask:    [{ name: '3D 立体遮光眼罩' }],
+  repellent:   [{ name: '含避蚊胺（DEET）的驱蚊液' }],
+  towel:       [{ name: '压缩毛巾（独立包装）' }],
+  slippers:    [{ name: '可折叠防滑底拖鞋' }],
+  toilet_seat: [{ name: '独立包装马桶垫' }],
+  sheets:      [{ name: '隔脏睡袋' }],
+  wet_wipes:   [{ name: '75% 酒精消毒湿巾' }],
+  charger:     [{ name: '2 米长快充线' }],
+  powerbank:   [{ name: '大容量双向快充充电宝' }],
+  gan_charger: [{ name: '氮化镓多口充电器', brand: '摩米士（小魔方）' }],
+  usb_blocker: [{ name: 'USB 数据阻断器' }],
+  power_strip: [{ name: '魔方插座' }],
+  night_light: [{ name: '感应式小夜灯' }],
+  laundry:     [{ name: '便携洗衣片' }],
 };
 
 // —— 固定检查清单（docs/规则表.md §4）——

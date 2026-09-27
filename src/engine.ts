@@ -77,8 +77,8 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
 }
 
 // —— 好物收藏：种子来自 data.ts（GEAR_SEED），用户修改以 localStorage 为准 ——
-const GEAR_KEY = 'htb_gear_v1';
-export interface GearPick { name: string; note: string; custom?: boolean }
+const GEAR_KEY = 'htb_gear_v2';
+export interface GearPick { name: string; brand?: string }
 
 function gearOverrides(): Record<string, GearPick[]> {
   return JSON.parse(Storage.getItem(GEAR_KEY) || '{}') as Record<string, GearPick[]>;

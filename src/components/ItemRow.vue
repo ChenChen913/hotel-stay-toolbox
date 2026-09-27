@@ -27,7 +27,7 @@ const gear = ref<GearPick[]>(props.item.itemId ? listGear(props.item.itemId) : [
 const showGear = ref(false);
 const adding = ref(false);
 const newName = ref('');
-const newNote = ref('');
+const newBrand = ref('');
 
 function save() {
   if (props.item.itemId) saveGear(props.item.itemId, JSON.parse(JSON.stringify(gear.value)));
@@ -35,9 +35,10 @@ function save() {
 function addPick() {
   const name = newName.value.trim();
   if (!name) return;
-  gear.value.push({ name, note: newNote.value.trim(), custom: true });
-  newName.value = ''; newNote.value = '';
+  gear.value.push({ name, brand: newBrand.value.trim() || undefined });
+  newName.value = ''; newBrand.value = '';
   save();
+  adding.value = false; // 保存后收起输入框
 }
 function removePick(i: number) {
   gear.value.splice(i, 1);
@@ -81,12 +82,15 @@ function onAssign(e: Event) {
     <div v-if="showGear" class="gearpanel">
       <div class="gearhead">好物收藏<span class="gearfoot">个人偏好 · 非商业推荐</span></div>
       <div v-for="(g, i) in gear" :key="g.name + i" class="gearitem">
-        <div class="gearinfo"><b>{{ g.name }}</b><span class="muted">{{ g.note }}</span></div>
+        <div class="gearinfo">
+          <b>{{ g.name }}</b>
+          <span v-if="g.brand" class="gbrand">{{ g.brand }}</span>
+        </div>
         <button class="pickdel" aria-label="删除好物" @click="removePick(i)"><Trash2 :size="13" /></button>
       </div>
       <div v-if="adding" class="gearadd">
         <input v-model="newName" type="text" class="ginput" placeholder="名称，如：一次性压缩毛巾">
-        <input v-model="newNote" type="text" class="ginput" placeholder="备注（可选）" @keyup.enter="addPick">
+        <input v-model="newBrand" type="text" class="ginput" placeholder="品牌（可选）" @keyup.enter="addPick">
         <button class="btn small" @click="addPick">保存</button>
       </div>
       <div class="gearactions">
@@ -121,10 +125,12 @@ function onAssign(e: Event) {
 }
 .gearhead { display: flex; align-items: baseline; justify-content: space-between; font-weight: 650; font-size: 13.5px; margin-bottom: 4px; }
 .gearfoot { font-size: 11px; color: var(--ink-3); font-weight: 400; }
-.gearitem { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px dashed var(--hairline); }
+.gearitem { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px dashed var(--hairline); }
 .gearitem:last-of-type { border-bottom: 0; }
-.gearinfo { flex: 1; display: flex; flex-direction: column; gap: 1px; font-size: 13.5px; }
-.gearinfo .muted { font-size: 12px; }
+.gearinfo { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+.gearinfo b { font-weight: 650; }
+.gbrand { font-size: 12px; color: var(--ink-2); }
+.gbrand::before { content: "品牌 "; color: var(--ink-3); font-size: 11px; }
 .pickdel { border: 0; background: none; color: var(--ink-3); cursor: pointer; padding: 2px; }
 .pickdel:active { color: var(--red); }
 .gearadd { display: flex; gap: 6px; margin-top: 7px; }
