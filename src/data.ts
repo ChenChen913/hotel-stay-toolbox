@@ -11,8 +11,18 @@ export const ITEMS: ItemDef[] = [
   { id: 'toothbrush', name: '牙刷/牙膏',     cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '套', when: () => true },
   { id: 'towel',      name: '毛巾/压缩毛巾', cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '条', when: () => true },
   { id: 'slippers',   name: '拖鞋',          cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '双', when: () => true },
+  { id: 'shower_filter', name: '便携过滤花洒', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
+  { id: 'squeeze_bottles', name: '分装瓶（洗护分装）', cat: '洗漱', users: 'adult', prep: '可选', unit: '个', when: () => true },
+  { id: 'bath_towel',  name: '速干浴巾', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '条', when: () => true },
+  { id: 'razor',       name: '剃须刀', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
+  { id: 'makeup_remover', name: '卸妆棉', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '包', when: () => true },
+  { id: 'cup',         name: '折叠漱口杯', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
+  { id: 'cutlery',     name: '便携餐具', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '套', when: () => true },
   { id: 'toilet_seat',name: '一次性马桶垫', cat: '卫生', users: 'adult',  prep: '建议购买', unit: '片', qty: c => c.adults * (c.nights + 1), when: () => true },
   { id: 'wet_wipes',  name: '湿巾/酒精湿巾', cat: '卫生', users: 'shared', prep: '建议购买', unit: '包', when: () => true },
+  { id: 'film',        name: '一次性隔离贴膜（开关/马桶）', cat: '卫生', users: 'shared', prep: '可选', unit: '包', when: () => true },
+  { id: 'bathtub_liners', name: '一次性浴缸套', cat: '卫生', users: 'shared', prep: '可选', unit: '只', when: () => true },
+  { id: 'lint_roller', name: '粘毛器', cat: '卫生', users: 'shared', prep: '可选', unit: '个', when: () => true },
   { id: 'flashlight', name: '小型手电筒', cat: '安全', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
   { id: 'door_stop',  name: '阻门器/顶门器', cat: '安全', users: 'shared', prep: '建议购买', unit: '个', when: () => true,
     gear: [{ name: '阻门器（通用款）', note: '有效的额外防护，但不能替代反锁与门链' }] },
@@ -60,10 +70,7 @@ export const ITEMS: ItemDef[] = [
 
   // —— 出行/生活补充（原指南 A12/A13/A28/N9.1）——
   { id: 'umbrella',   name: '折叠伞', cat: '出行', users: 'adult',  prep: '可选',     unit: '把', when: () => true },
-  { id: 'cup',        name: '折叠漱口杯', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
-  { id: 'cutlery',    name: '便携餐具', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '套', when: () => true },
-  { id: 'lint_roller',name: '粘毛器', cat: '卫生', users: 'shared', prep: '可选',     unit: '个', when: () => true },
-  { id: 'cash',       name: '小额现金（断网断电备用）', cat: '证件', users: 'adult', prep: '推荐', unit: '份', when: () => true },
+        { id: 'cash',       name: '小额现金（断网断电备用）', cat: '证件', users: 'adult', prep: '推荐', unit: '份', when: () => true },
 
   // —— 到店购买（抵达后本地补给）——
   { id: 'bottled_water', name: '大桶矿泉水（烧水/刷牙）', cat: '补给', users: 'shared', prep: '到店购买', unit: '桶', when: () => true },
@@ -81,6 +88,7 @@ export const CAT_ORDER = ['证件', '洗漱', '衣物', '出行', '卫生', '睡
 // —— 好物收藏（只记品牌；⚪ 个人偏好，非商业推荐；默认为空，用户自行添加）——
 // 仅保留两组作为测试数据
 export const GEAR_SEED: Record<string, string[]> = {
+  shower_filter: ['复旦申花（便携过滤款）'],
   flashlight: ['小型可充电手电筒'],
   earplugs:    ['安耳悠'],
   gan_charger: ['摩米士（小魔方）'],
