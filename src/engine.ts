@@ -20,8 +20,7 @@ export const Storage: MiniStorage =
   typeof localStorage === 'undefined' ? memoryStorage() : localStorage;
 
 export const STORE_KEY = 'htb_stays_v1';
-const GEAR_KEY = 'htb_gear_v2';
-export interface GearPick { name: string; brand?: string }
+const GEAR_KEY = 'htb_gear_v3';
 
 // 条件 → 物品清单（含数量与准备方式）
 export function buildPrep(c: Conditions): PrepItem[] {
@@ -79,25 +78,15 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
 }
 
 // —— 好物收藏：种子来自 data.ts（GEAR_SEED），用户修改以 localStorage 为准 ——
-function gearOverrides(): Record<string, GearPick[]> {
-  return JSON.parse(Storage.getItem(GEAR_KEY) || '{}') as Record<string, GearPick[]>;
+function gearOverrides(): Record<string, string[]> {
+  return JSON.parse(Storage.getItem(GEAR_KEY) || '{}') as Record<string, string[]>;
 }
-export function listGear(itemId: string): GearPick[] {
-  const override = gearOverrides()[itemId];
-  if (override) return override;
-  return (GEAR_SEED[itemId] || []).map(g => ({ ...g }));
+export function listGear(itemId: string): string[] {
+  return gearOverrides()[itemId] ?? GEAR_SEED[itemId] ?? [];
 }
-export function saveGear(itemId: string, list: GearPick[]): void {
+export function saveGear(itemId: string, brands: string[]): void {
   const o = gearOverrides();
-  o[itemId] = list;
-  Storage.setItem(GEAR_KEY, JSON.stringify(o));
-}
-export function gearIsCustomized(itemId: string): boolean {
-  return itemId in gearOverrides();
-}
-export function resetGear(itemId: string): void {
-  const o = gearOverrides();
-  delete o[itemId];
+  o[itemId] = brands;
   Storage.setItem(GEAR_KEY, JSON.stringify(o));
 }
 
@@ -106,7 +95,7 @@ export interface Backup {
   app: 'hotel-toolbox';
   exportedAt: string;
   stays: Stay[];
-  gear: Record<string, GearPick[]>;
+  gear: Record<string, string[]>;
 }
 export function exportData(): string {
   return JSON.stringify({ app: 'hotel-toolbox', exportedAt: new Date().toISOString(), stays: listStays(), gear: gearOverrides() }, null, 2);

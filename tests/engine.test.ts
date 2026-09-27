@@ -1,7 +1,7 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
 import { describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
-import { buildPrep, exportData, getStay, importData, listGear, listStays, newStay, resetGear, saveGear, saveStay } from '../src/engine';
+import { buildPrep, exportData, getStay, importData, listGear, listStays, newStay, saveGear, saveStay } from '../src/engine';
 import type { Conditions, PrepItem } from '../src/types';
 
 const base: Conditions = {
@@ -125,13 +125,13 @@ describe('行程存取', () => {
 });
 
 describe('好物收藏存储', () => {
-  it('saveGear 覆盖种子，resetGear 恢复默认', () => {
-    const itemId = 'towel';
-    expect(listGear(itemId).some(g => g.name.includes('压缩毛巾'))).toBe(true);
-    saveGear(itemId, [{ name: '自用款' }]);
-    expect(listGear(itemId)).toEqual([{ name: '自用款' }]);
-    resetGear(itemId);
-    expect(listGear(itemId).some(g => g.name.includes('压缩毛巾'))).toBe(true);
+  it('默认仅测试种子，saveGear 覆盖后可读回，清空即默认', () => {
+    expect(listGear('earplugs')).toEqual(['安耳悠']);
+    expect(listGear('towel')).toEqual([]);
+    saveGear('towel', ['全棉时代']);
+    expect(listGear('towel')).toEqual(['全棉时代']);
+    saveGear('towel', []);
+    expect(listGear('towel')).toEqual([]);
   });
 });
 

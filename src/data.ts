@@ -70,24 +70,11 @@ export function defaultQty(item: ItemDef, c: Conditions): number {
 
 export const CAT_ORDER = ['证件', '洗漱', '衣物', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
 
-// —— 好物收藏（只记「名称 + 品牌」两项；⚪ 个人偏好，非商业推荐；用户可在应用内增删）——
-export interface GearPick { name: string; brand?: string }
-export const GEAR_SEED: Record<string, GearPick[]> = {
-  earplugs:    [{ name: '慢回弹耳塞', brand: '安耳悠' }],
-  eye_mask:    [{ name: '3D 立体遮光眼罩' }],
-  repellent:   [{ name: '含避蚊胺（DEET）的驱蚊液' }],
-  towel:       [{ name: '压缩毛巾（独立包装）' }],
-  slippers:    [{ name: '可折叠防滑底拖鞋' }],
-  toilet_seat: [{ name: '独立包装马桶垫' }],
-  sheets:      [{ name: '隔脏睡袋' }],
-  wet_wipes:   [{ name: '75% 酒精消毒湿巾' }],
-  charger:     [{ name: '2 米长快充线' }],
-  powerbank:   [{ name: '大容量双向快充充电宝' }],
-  gan_charger: [{ name: '氮化镓多口充电器', brand: '摩米士（小魔方）' }],
-  usb_blocker: [{ name: 'USB 数据阻断器' }],
-  power_strip: [{ name: '魔方插座' }],
-  night_light: [{ name: '感应式小夜灯' }],
-  laundry:     [{ name: '便携洗衣片' }],
+// —— 好物收藏（只记品牌；⚪ 个人偏好，非商业推荐；默认为空，用户自行添加）——
+// 仅保留两组作为测试数据
+export const GEAR_SEED: Record<string, string[]> = {
+  earplugs:    ['安耳悠'],
+  gan_charger: ['摩米士（小魔方）'],
 };
 
 // —— 固定检查清单（docs/规则表.md §4）——
