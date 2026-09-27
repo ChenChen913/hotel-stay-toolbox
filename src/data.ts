@@ -16,6 +16,19 @@ export const ITEMS: ItemDef[] = [
   { id: 'door_stop',  name: '阻门器/顶门器', cat: '安全', users: 'shared', prep: '建议购买', unit: '个', when: () => true,
     gear: [{ name: '阻门器（通用款）', note: '有效的额外防护，但不能替代反锁与门链' }] },
 
+  // —— 衣物（数量 = 人数 × 天数，可整体增删改；打包原则见知识库「衣物打包」）——
+  { id: 'underwear',  name: '内衣裤+袜子（每天一套）', cat: '衣物', users: 'adult', prep: '家里带', unit: '套',
+    qty: c => c.adults * (c.nights + 1), when: () => true },
+  { id: 'tops',       name: '换洗上衣', cat: '衣物', users: 'adult', prep: '家里带', unit: '件',
+    qty: c => c.adults * Math.min(c.nights + 1, 4), when: () => true },
+  { id: 'pants',      name: '裤子/下装', cat: '衣物', users: 'adult', prep: '家里带', unit: '条',
+    qty: c => c.adults * 2, when: () => true },
+  { id: 'sleepwear',  name: '睡衣', cat: '衣物', users: 'adult', prep: '家里带', unit: '套', when: () => true },
+  { id: 'outerwear',  name: '外套（空调房/降温备用）', cat: '衣物', users: 'adult', prep: '家里带', unit: '件', when: () => true },
+  { id: 'dirty_bag',  name: '密封袋/脏衣袋（脏衣分装）', cat: '衣物', users: 'shared', prep: '可选', unit: '个', when: () => true },
+  { id: 'kids_clothes', name: '儿童换洗衣物', cat: '衣物', users: 'child', prep: '家里带', unit: '套',
+    qty: c => c.children * (c.nights + 1), when: c => c.children > 0 },
+
   // —— 偏好开关触发 ——
   { id: 'sheets',      name: '一次性床单/隔脏睡袋', cat: '卫生', users: 'adult',  prep: '建议购买', unit: '套', qty: c => c.adults * (c.nights + 1), when: c => c.prefs.hygiene },
   { id: 'eye_mask',    name: '眼罩',   cat: '睡眠', users: 'adult',  prep: '家里带', unit: '个', when: c => c.prefs.sleep },
@@ -55,7 +68,7 @@ export function defaultQty(item: ItemDef, c: Conditions): number {
   return item.users === 'adult' ? c.adults : item.users === 'child' ? c.children : 1;
 }
 
-export const CAT_ORDER = ['证件', '洗漱', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
+export const CAT_ORDER = ['证件', '洗漱', '衣物', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
 
 // —— 好物收藏（⚪ 个人偏好，非商业推荐；来自原指南与作者自用清单）——
 export interface GearPick { itemId: string; name: string; note: string }
@@ -279,6 +292,9 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     body: '话术（打前台电话，不开门）：「我是××房间住客，现在有人敲门自称是酒店工作人员／送东西，请确认是否为酒店安排的，并请派人上来确认。」核实前保持门链扣好。',
     source: '治安防范常识', updated: '2026-09',
     copy: '我是××房间住客，现在有人敲门自称是酒店工作人员／送东西，请确认是否为酒店安排的，并请派人上来确认。' },
+  { id: 'k45', module: '行前', title: '衣物打包：数量公式与省空间技巧', evidence: 'experience', risk: 'low',
+    body: '常用公式：内衣裤和袜子每天一套再各加一套备用（本工具箱按「人数 ×（晚数 + 1）」生成）；上衣可隔天重穿，同色系搭配能少带几件；外套无论季节都带一件（空调房与降温备用）。住四晚以上工具箱会自动加洗衣用品，酒店有洗衣服务时可以少带一半。省空间技巧：卷起来叠放，内衣袜塞进鞋内和行李箱缝隙，脏衣用密封袋分装。随身行李里放一套备用衣物，防托运延误。',
+    source: 'Lonely Planet / Vacation Express 打包指南；个人经验', updated: '2026-09' },
 ];
 
 // 生成清单后的「想想还有什么要带」提示（不替用户判断）
@@ -287,6 +303,7 @@ export const CUSTOM_HINTS: CustomHint[] = [
   { icon: 'camera',    text: '摄影：相机、电池、存储卡' },
   { icon: 'pill',      text: '个人：常用药品、护理用品' },
   { icon: 'baby',      text: '儿童：奶粉、辅食、玩具' },
+  { icon: 'shirt',     text: '衣物：泳衣、正装、运动装备等，按行程自行添加' },
   { icon: 'paw-print', text: '宠物：粮食、牵引绳（差异大，请自行添加）' },
 ];
 

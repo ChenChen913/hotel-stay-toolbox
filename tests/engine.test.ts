@@ -42,6 +42,16 @@ describe('规则引擎 buildPrep', () => {
     expect(get(kid, '儿童牙刷')).toBeDefined();
   });
 
+  it('衣物按人数与天数生成', () => {
+    const p = buildPrep(base);
+    expect(get(p, '内衣裤')!.qty).toBe(8);   // 2 × (3+1)
+    expect(get(p, '换洗上衣')!.qty).toBe(8); // 2 × min(3+1, 4)
+    expect(get(p, '睡衣')!.qty).toBe(2);
+    expect(get(p, '密封袋')).toBeDefined();
+    const kids = buildPrep({ ...base, children: 1 });
+    expect(get(kids, '儿童换洗衣物')!.qty).toBe(4);
+  });
+
   it('老人与长住', () => {
     const old = buildPrep({ ...base, elderly: true });
     expect(get(old, '防滑拖鞋')).toBeDefined();
@@ -67,8 +77,8 @@ describe('数据完整性', () => {
     // 官方三项观察之三：应急物资必须出现
     expect(CHECKLISTS.checkin.groups[0].items.some(i => i.includes('呼吸面罩'))).toBe(true);
   });
-  it('知识条目 42 条且都带来源/等级', () => {
-    expect(KNOWLEDGE.length).toBe(42);
+  it('知识条目 43 条且都带来源/等级', () => {
+    expect(KNOWLEDGE.length).toBe(43);
     expect(KNOWLEDGE.every(k => k.source && k.updated && k.evidence && k.risk)).toBe(true);
   });
   it('臭虫判据不使用被核查否定的「黑色小点=粪便」表述', () => {
