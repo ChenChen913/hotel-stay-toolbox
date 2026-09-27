@@ -36,10 +36,7 @@ function add() {
 
 <style scoped>
 .clothingadd { display: flex; align-items: center; gap: 8px; padding: 9px 0; flex-wrap: wrap; }
-.csel {
-  flex: 1; min-width: 130px; min-height: 36px; padding: 4px 26px 4px 8px; font-size: 13px; color: var(--ink);
-  border: 1px solid var(--line); border-radius: 9px; background: #fff;
-}
+.csel { flex: 1; min-width: 130px; min-height: 38px; font-size: 13px; }
 .cinput { flex: 1; min-width: 120px; min-height: 36px; padding: 4px 8px; font-size: 13px; color: var(--ink); border: 1px solid var(--line); border-radius: 9px; background: #fff; }
 .btn.small:disabled { opacity: 0.45; cursor: not-allowed; }
 </style>

@@ -70,10 +70,7 @@ function onAssign(e: Event) {
 .del { border: 0; background: none; color: var(--ink-3); padding: 6px 2px; cursor: pointer; }
 .del:active { color: var(--red); }
 .meta { display: flex; align-items: center; gap: 7px; margin-top: 3px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
-.assign {
-  min-height: 24px; padding: 1px 4px; font-size: 12px; color: var(--ink-2);
-  border: 1px solid var(--hairline); border-radius: 7px; background: rgba(255, 255, 255, 0.55);
-}
+.assign { min-height: 26px; padding: 1px 20px 1px 6px; font-size: 12px; color: var(--ink-2); border-radius: 7px; }
 .gearbtn {
   display: inline-flex; align-items: center; gap: 3px; padding: 2.5px 9px;
   border-radius: 99px; border: 1px solid rgba(169, 133, 61, 0.3);
