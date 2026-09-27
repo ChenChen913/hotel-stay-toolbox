@@ -1,4 +1,4 @@
-// 规则求值 + 行程存储。纯逻辑，不依赖 Vue/DOM；Storage 在 node 中用内存兜底（测试环境）。
+// engine.ts — 规则求值 + 行程存储 + 备份。纯逻辑，不依赖 Vue/DOM；node 测试用内存 Storage。
 import type { Conditions, PrepItem, Stay } from './types';
 import { CAT_ORDER, CHECKLISTS, GEAR_SEED, ITEMS, defaultQty } from './data';
 
@@ -20,6 +20,8 @@ export const Storage: MiniStorage =
   typeof localStorage === 'undefined' ? memoryStorage() : localStorage;
 
 export const STORE_KEY = 'htb_stays_v1';
+const GEAR_KEY = 'htb_gear_v2';
+export interface GearPick { name: string; brand?: string }
 
 // 条件 → 物品清单（含数量与准备方式）
 export function buildPrep(c: Conditions): PrepItem[] {
@@ -77,9 +79,6 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
 }
 
 // —— 好物收藏：种子来自 data.ts（GEAR_SEED），用户修改以 localStorage 为准 ——
-const GEAR_KEY = 'htb_gear_v2';
-export interface GearPick { name: string; brand?: string }
-
 function gearOverrides(): Record<string, GearPick[]> {
   return JSON.parse(Storage.getItem(GEAR_KEY) || '{}') as Record<string, GearPick[]>;
 }
@@ -100,4 +99,24 @@ export function resetGear(itemId: string): void {
   const o = gearOverrides();
   delete o[itemId];
   Storage.setItem(GEAR_KEY, JSON.stringify(o));
+}
+
+// —— 数据备份：导出 / 导入（缓解 localStorage 清空即丢失的风险）——
+export interface Backup {
+  app: 'hotel-toolbox';
+  exportedAt: string;
+  stays: Stay[];
+  gear: Record<string, GearPick[]>;
+}
+export function exportData(): string {
+  return JSON.stringify({ app: 'hotel-toolbox', exportedAt: new Date().toISOString(), stays: listStays(), gear: gearOverrides() }, null, 2);
+}
+export function importData(text: string): { stays: number; gear: number } {
+  const data = JSON.parse(text) as Partial<Backup>;
+  if (data.app !== 'hotel-toolbox' || !Array.isArray(data.stays)) throw new Error('不是本工具箱的备份文件');
+  const stays = data.stays.filter(s => s && typeof s.id === 'string' && Array.isArray(s.prep) && s.conditions);
+  Storage.setItem(STORE_KEY, JSON.stringify(stays));
+  const gear = data.gear && typeof data.gear === 'object' ? data.gear : {};
+  Storage.setItem(GEAR_KEY, JSON.stringify(gear));
+  return { stays: stays.length, gear: Object.keys(gear).length };
 }

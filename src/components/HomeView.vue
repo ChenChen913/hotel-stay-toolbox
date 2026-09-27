@@ -1,12 +1,41 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Bell, ChevronRight, Copy, Plus } from 'lucide-vue-next';
-import { buildPrep, listStays, newStay, saveStay, sortItems } from '../engine';
+import { Bell, ChevronRight, Copy, Download, Plus, Upload } from 'lucide-vue-next';
+import { buildPrep, exportData, importData, listStays, newStay, saveStay, sortItems } from '../engine';
 import type { Stay } from '../types';
 import { fmtDate, goWizard, openStay, stayPhaseLabel } from '../store';
 import ProgressPill from './ProgressPill.vue';
 
 const stays = ref<Stay[]>([...listStays()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+const backupMsg = ref('');
+
+function doExport() {
+  const blob = new Blob([exportData()], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  a.href = url;
+  a.download = `hotel-toolbox-backup-${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  backupMsg.value = '已导出备份文件';
+}
+function onImportFile(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  file.text().then(text => {
+    try {
+      const r = importData(text);
+      stays.value = [...listStays()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      backupMsg.value = `已导入 ${r.stays} 个行程、${r.gear} 组好物`;
+    } catch (err) {
+      backupMsg.value = err instanceof Error ? err.message : '导入失败';
+    }
+  });
+}
 
 function copyLast() {
   const last = stays.value[0];
@@ -56,6 +85,16 @@ const hasStays = computed(() => stays.value.length > 0);
       <ProgressPill :done="summary(s).done" :total="summary(s).total" label="已备齐" class="sc-prog" />
     </article>
   </template>
+
+  <details class="glass backup">
+    <summary>备份与恢复</summary>
+    <p class="muted">数据只存在本机浏览器。导出的 JSON 文件可在换设备或重装浏览器后导入恢复。</p>
+    <div class="backuprow">
+      <button class="btn small" @click="doExport"><Download :size="14" />导出备份</button>
+      <label class="btn small ghost filebtn"><Upload :size="14" />导入备份<input type="file" accept=".json,application/json" @change="onImportFile"></label>
+    </div>
+    <p v-if="backupMsg" class="muted bmsg">{{ backupMsg }}</p>
+  </details>
 </template>
 
 <style scoped>
@@ -89,4 +128,12 @@ const hasStays = computed(() => stays.value.length > 0);
 .phase { flex-shrink: 0; font-size: 11.5px; padding: 3px 10px; border-radius: 99px; color: var(--pine-deep); background: rgba(28, 90, 74, 0.12); border: 1px solid rgba(28, 90, 74, 0.25); }
 .chev { color: var(--ink-3); flex-shrink: 0; }
 .sc-prog { margin-top: 10px; }
+
+.backup { padding: 12px 16px; margin-top: 14px; }
+.backup summary { cursor: pointer; font-size: 14px; font-weight: 600; list-style: none; }
+.backup summary::-webkit-details-marker { display: none; }
+.backuprow { display: flex; gap: 10px; margin-top: 10px; }
+.filebtn { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 6px; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.bmsg { margin-top: 8px; }
 </style>
