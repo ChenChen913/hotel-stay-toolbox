@@ -58,13 +58,28 @@ describe('数据完整性', () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(ITEMS.every(i => CAT_ORDER.includes(i.cat))).toBe(true);
   });
-  it('检查清单项数（规则表 §4）', () => {
-    expect(CHECKLISTS.checkin.groups.reduce((n, g) => n + g.items.length, 0)).toBe(13);
-    expect(CHECKLISTS.checkout.groups.reduce((n, g) => n + g.items.length, 0)).toBe(13);
+  it('检查清单项数与组级标注（规则表 §4）', () => {
+    expect(CHECKLISTS.checkin.groups.reduce((n, g) => n + g.items.length, 0)).toBe(15);
+    expect(CHECKLISTS.checkout.groups.reduce((n, g) => n + g.items.length, 0)).toBe(14);
+    // 「60 秒」必须标注为工具箱自行添加的时间约束（核查纪律）
+    const fire = CHECKLISTS.checkin.groups[0];
+    expect(fire.note).toContain('不是官方术语');
+    // 官方三项观察之三：应急物资必须出现
+    expect(CHECKLISTS.checkin.groups[0].items.some(i => i.includes('呼吸面罩'))).toBe(true);
   });
-  it('知识条目 10 条且都带来源/等级', () => {
-    expect(KNOWLEDGE.length).toBe(10);
+  it('知识条目 42 条且都带来源/等级', () => {
+    expect(KNOWLEDGE.length).toBe(42);
     expect(KNOWLEDGE.every(k => k.source && k.updated && k.evidence && k.risk)).toBe(true);
+  });
+  it('臭虫判据不使用被核查否定的「黑色小点=粪便」表述', () => {
+    const k6 = KNOWLEDGE.find(k => k.id === 'k6')!;
+    expect(k6.body).not.toContain('黑色小点（粪便）');
+    expect(k6.body).toContain('锈色血迹');
+  });
+  it('紧急话术条目都带可复制文本', () => {
+    const urgent = KNOWLEDGE.filter(k => k.module === '紧急联络');
+    expect(urgent.length).toBe(4);
+    expect(urgent.every(k => (k.copy ?? '').length > 10)).toBe(true);
   });
 });
 

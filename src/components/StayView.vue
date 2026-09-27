@@ -18,6 +18,19 @@ const prepGroups = computed(() => {
   const cats = [...new Set(items.map(i => i.cat))].sort((a, b) => CAT_ORDER.indexOf(a) - CAT_ORDER.indexOf(b));
   return cats.map(cat => ({ cat, items: items.filter(i => i.cat === cat) }));
 });
+// 使用人选项（聊04）：≥2 名成人或带儿童时出现，物品可绑定到人
+const assignOptions = computed(() => {
+  const s = stay();
+  const opts = ['全体'];
+  for (let i = 1; i <= s.conditions.adults; i++) opts.push(`入住人${i}`);
+  if (s.conditions.children > 0) opts.push('儿童');
+  return opts.length > 2 ? opts : (s.conditions.children > 0 ? opts : null);
+});
+const stageHint = computed(() => {
+  const s = stay();
+  const label = { prep: '准备', checkin: '入住', checkout: '退房' }[stage.value];
+  return `按日期已为你定位到「${label}」阶段`;
+});
 const prepProgress = computed(() => {
   const s = stay();
   const items = sortItems([...s.prep, ...s.custom]);
@@ -49,7 +62,7 @@ const fmtStay = () => fmtDate(stay().date);
     <button class="icon-btn" aria-label="返回" @click="goHome()"><ArrowLeft :size="18" /></button>
     <div class="grow">
       <div class="st-date display num">{{ fmtStay() }} · {{ stay().nights }} 晚</div>
-      <div class="muted">{{ stay().conditions.purpose }}</div>
+      <div class="muted">{{ stay().conditions.purpose }} · {{ stageHint }}</div>
     </div>
   </header>
 
@@ -65,7 +78,8 @@ const fmtStay = () => fmtDate(stay().date);
     <template v-for="g in prepGroups" :key="g.cat">
       <div class="sec-label">{{ g.cat }}</div>
       <div class="glass card">
-        <ItemRow v-for="it in g.items" :key="it.name" :item="it" @toggle="(v: boolean) => { it.done = v; persist(); }" @remove="removeItem(it)" :removable="it.source === '自定义'" />
+        <ItemRow v-for="it in g.items" :key="it.name" :item="it" :assign-options="assignOptions ?? undefined"
+                 @toggle="(v: boolean) => { it.done = v; persist(); }" @remove="removeItem(it)" :removable="it.source === '自定义'" />
       </div>
     </template>
     <div class="glass card think">

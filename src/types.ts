@@ -22,7 +22,7 @@ export interface Conditions {
   prefs: Prefs;
 }
 
-export type Prep = '必带' | '推荐' | '建议购买' | '家里带' | '可选';
+export type Prep = '必带' | '推荐' | '建议购买' | '家里带' | '可选' | '到店购买';
 export type Users = 'adult' | 'child' | 'shared';
 
 export interface ItemDef {
@@ -35,6 +35,8 @@ export interface ItemDef {
   /** 自定义数量函数（消耗品按晚冗余）；缺省 = 按使用人数 */
   qty?: (c: Conditions) => number;
   when: (c: Conditions) => boolean;
+  /** 作者好物收藏（⚪ 个人偏好，非商业推荐） */
+  gear?: { name: string; note: string }[];
 }
 
 export interface PrepItem {
@@ -47,6 +49,8 @@ export interface PrepItem {
   users: string;
   qty: number;
   done: boolean;
+  /** 使用人绑定（聊04：全体 / 入住人1… / 儿童） */
+  assign?: string;
 }
 
 export type RiskLevel = 'high' | 'mid' | 'low';
@@ -54,6 +58,8 @@ export type RiskLevel = 'high' | 'mid' | 'low';
 export interface CheckGroup {
   name: string;
   risk: RiskLevel;
+  /** 组级说明（如「60 秒为时间约束，非官方术语」） */
+  note?: string;
   items: string[];
 }
 
@@ -73,6 +79,8 @@ export interface KnowledgeEntry {
   body: string;
   source: string;
   updated: string;
+  /** 紧急话术等可一键复制的内容 */
+  copy?: string;
 }
 
 export interface CustomHint {

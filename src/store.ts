@@ -9,9 +9,35 @@ export const currentStay = ref<Stay | null>(null);
 
 export function scrollTop() { window.scrollTo({ top: 0 }); }
 
+/** 按日期推断当前阶段（聊02 定稿：系统自动把用户带到当前阶段） */
+export function suggestedStage(s: Stay): Stage {
+  if (!s.date) return 'prep';
+  const [y, m, d] = s.date.split('-').map(Number);
+  const start = new Date(y, m - 1, d);
+  const end = new Date(y, m - 1, d + s.nights - 1);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (today < start) return 'prep';
+  if (today <= end) return 'checkin';
+  return 'checkout';
+}
+
+/** 首页卡片上的阶段徽标文案（不在期内则不显示） */
+export function stayPhaseLabel(s: Stay): string | null {
+  if (!s.date) return null;
+  const [y, m, d] = s.date.split('-').map(Number);
+  const start = new Date(y, m - 1, d);
+  const end = new Date(y, m - 1, d + s.nights - 1);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (today < start) return `还有 ${Math.ceil((+start - +today) / 86400000)} 天入住`;
+  if (today <= end) return '入住中';
+  return null;
+}
+
 export function openStay(id: string) {
   currentStay.value = getStay(id);
-  stage.value = 'prep';
+  stage.value = currentStay.value ? suggestedStage(currentStay.value) : 'prep';
   view.value = 'stay';
   scrollTop();
 }

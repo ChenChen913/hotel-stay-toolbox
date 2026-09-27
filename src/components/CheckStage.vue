@@ -29,6 +29,7 @@ function set(gi: number, ii: number, v: boolean) {
   <ProgressPill :done="doneCount()" :total="totalCount()" label="已完成" />
   <template v-for="(g, gi) in checklist.groups" :key="g.name">
     <div class="sec-label"><span class="dot" :class="RISK_TONE[g.risk]"></span>{{ g.name }}</div>
+    <p v-if="g.note" class="gnote">{{ g.note }}</p>
     <div class="glass card">
       <CheckGroupBlock :items="g.items" :states="stay()[stage][gi]" @set="(ii: number, v: boolean) => set(gi, ii, v)" />
     </div>
@@ -38,4 +39,5 @@ function set(gi: number, ii: number, v: boolean) {
 <style scoped>
 .card { padding: 4px 18px; }
 .sec-label .dot { flex-shrink: 0; }
+.gnote { margin: -4px 4px 8px; font-size: 12.5px; color: var(--ink-2); }
 </style>

@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { Bell, ChevronRight, Copy, Plus } from 'lucide-vue-next';
 import { buildPrep, listStays, newStay, saveStay, sortItems } from '../engine';
 import type { Stay } from '../types';
-import { fmtDate, goWizard, openStay } from '../store';
+import { fmtDate, goWizard, openStay, stayPhaseLabel } from '../store';
 import ProgressPill from './ProgressPill.vue';
 
 const stays = ref<Stay[]>([...listStays()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
@@ -45,13 +45,14 @@ const hasStays = computed(() => stays.value.length > 0);
   <template v-if="hasStays">
     <div class="sec-label">最近的入住</div>
     <article v-for="s in stays" :key="s.id" class="glass staycard" @click="openStay(s.id)">
-      <div class="sc-head">
-        <div class="grow">
-          <div class="sc-date display num">{{ fmtDate(s.date) }} · {{ s.nights }} 晚</div>
-          <div class="muted">{{ s.conditions.purpose }}<template v-if="s.conditions.children"> · {{ s.conditions.children }} 个儿童</template><template v-if="s.conditions.elderly"> · 有老人</template></div>
+        <div class="sc-head">
+          <div class="grow">
+            <div class="sc-date display num">{{ fmtDate(s.date) }} · {{ s.nights }} 晚</div>
+            <div class="muted">{{ s.conditions.purpose }}<template v-if="s.conditions.children"> · {{ s.conditions.children }} 个儿童</template><template v-if="s.conditions.elderly"> · 有老人</template></div>
+          </div>
+          <span v-if="stayPhaseLabel(s)" class="phase">{{ stayPhaseLabel(s) }}</span>
+          <ChevronRight :size="18" class="chev" />
         </div>
-        <ChevronRight :size="18" class="chev" />
-      </div>
       <ProgressPill :done="summary(s).done" :total="summary(s).total" label="已备齐" class="sc-prog" />
     </article>
   </template>
@@ -85,6 +86,7 @@ const hasStays = computed(() => stays.value.length > 0);
 .staycard:hover { border-color: var(--pine); }
 .sc-head { display: flex; align-items: center; gap: 10px; }
 .sc-date { font-size: 17px; font-weight: 650; }
+.phase { flex-shrink: 0; font-size: 11.5px; padding: 3px 10px; border-radius: 99px; color: var(--pine-deep); background: rgba(28, 90, 74, 0.12); border: 1px solid rgba(28, 90, 74, 0.25); }
 .chev { color: var(--ink-3); flex-shrink: 0; }
 .sc-prog { margin-top: 10px; }
 </style>

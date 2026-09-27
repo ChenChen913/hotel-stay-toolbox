@@ -52,10 +52,10 @@ Open <http://localhost:5173/hotel-toolbox/>.
 The main flow has five steps:
 
 1. Click "创建一次入住" (create a stay) on the home page and answer 5 short questions (dates and nights, guests, companions, purpose, preferences)
-2. The app generates a packing list from 27 item rules; quantities are derived from guests and nights, and each item is tagged as "must bring / buy / bring from home"
+2. The app generates a packing list from 29 item rules; quantities are derived from guests and nights, and each item is tagged as "must bring / buy / bring from home"
 3. Check items off, adjust quantities, or add custom items (camera, medication, etc.)
-4. At the hotel, run the 13-item check-in check (including a 60-second fire check); before leaving, run the 13-item checkout check
-5. The knowledge section holds 10 entries with evidence levels and sources, covering fire safety, privacy, hygiene and consumer rights
+4. At the hotel, run the 15-item check-in check (fire observations and emergency supplies included); before leaving, run the 14-item checkout check
+5. The knowledge section holds 42 entries with evidence levels and sources across pre-trip, fire safety, privacy, hygiene, consumer rights and special scenarios, with a disclaimer up top and one-tap copy for emergency phrasing
 
 Stays are stored in the browser. The home page can duplicate the last stay as a template.
 
@@ -84,10 +84,10 @@ docs/
 
 ## Development
 
-Stack: Vite, Vue 3, TypeScript, Vitest, icons by lucide-vue-next.
+Stack: Vite, Vue 3, TypeScript, Vitest, icons by lucide-vue-next; installable and offline-capable via vite-plugin-pwa.
 
 ```sh
-npm test          # Run tests (9 suites)
+npm test          # Run tests (11 suites)
 npm run build     # Type check + production build
 npm run preview   # Preview the production build locally
 ```
@@ -108,7 +108,6 @@ A: The design settles on fixed rules: they are explainable, testable and work of
 ## Known limitations
 
 - Stay data lives in browser localStorage: clearing browser data deletes it, and there is no cross-device sync
-- The knowledge section has 10 seed entries; fact-checked material for the full set of 40 is in the repo, backfill pending
 - Season is not inferred automatically; users tick "mosquito season" in the questionnaire. Destination weather is not integrated
 - Quantity formulas are simplified rules (guests × (nights + 1)); adjust manually in the list
 

@@ -156,6 +156,7 @@ textarea.field, input.field { width: 100%; }
 }
 .tag.need { background: rgba(178, 58, 50, 0.1); color: var(--red); border-color: rgba(178, 58, 50, 0.22); }
 .tag.buy  { background: rgba(169, 133, 61, 0.12); color: #8a6a2c; border-color: rgba(169, 133, 61, 0.28); }
+.tag.shop { background: rgba(58, 110, 165, 0.1); color: var(--blue); border-color: rgba(58, 110, 165, 0.22); }
 .tag.home { background: rgba(63, 125, 84, 0.1); color: var(--green); border-color: rgba(63, 125, 84, 0.22); }
 .tag.rec  { background: rgba(28, 90, 74, 0.1); color: var(--pine); border-color: rgba(28, 90, 74, 0.22); }
 .tag.opt  { background: rgba(35, 41, 37, 0.06); color: var(--ink-2); border-color: var(--hairline); }
