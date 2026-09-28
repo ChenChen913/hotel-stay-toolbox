@@ -1,7 +1,7 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
 import { describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
-import { buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, newStay, saveGear, saveStay, Storage, STORE_KEY } from '../src/engine';
+import { buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, migrateItemKeyGear, newStay, saveGear, saveStay, Storage, STORE_KEY } from '../src/engine';
 import { suggestedStage } from '../src/store';
 import type { Conditions, PrepItem } from '../src/types';
 
@@ -125,14 +125,20 @@ describe('行程存取', () => {
   });
 });
 
-describe('好物收藏存储', () => {
-  it('默认仅测试种子，saveGear 覆盖后可读回，清空即默认', () => {
-    expect(listGear('earplugs')).toEqual(['安耳悠']);
-    expect(listGear('towel')).toEqual([]);
-    saveGear('towel', ['全棉时代']);
-    expect(listGear('towel')).toEqual(['全棉时代']);
-    saveGear('towel', []);
-    expect(listGear('towel')).toEqual([]);
+describe('好物收藏存储（按类别，v4）', () => {
+  it('种子按类别返回，saveGear 覆盖后可读回', () => {
+    expect(listGear('睡眠')).toEqual(['安耳悠']);
+    expect(listGear('洗漱')).toEqual([]);
+    saveGear('洗漱', ['全棉时代']);
+    expect(listGear('洗漱')).toEqual(['全棉时代']);
+    saveGear('洗漱', []);
+    expect(listGear('洗漱')).toEqual([]);
+  });
+  it('v3 按物品键的旧数据自动迁移为类别键', () => {
+    Storage.setItem('htb_gear_v3', JSON.stringify({ towel: ['全棉时代'], unknown_gadget: ['某品牌'] }));
+    const migrated = migrateItemKeyGear(JSON.parse(Storage.getItem('htb_gear_v3')!));
+    expect(migrated['洗漱']).toContain('全棉时代');
+    expect(migrated['其他']).toContain('某品牌');
   });
 });
 

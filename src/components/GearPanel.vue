@@ -3,24 +3,24 @@ import { ref } from 'vue';
 import { Trash2 } from 'lucide-vue-next';
 import { listGear, saveGear } from '../engine';
 
-const props = defineProps<{ itemId: string }>();
+const props = defineProps<{ cat: string }>();
 const emit = defineEmits<{ (e: 'change'): void }>();
 
-const brands = ref<string[]>(listGear(props.itemId));
+const brands = ref<string[]>(listGear(props.cat));
 const adding = ref(false);
 const newBrand = ref('');
 
 function save() {
-  saveGear(props.itemId, [...brands.value]);
+  saveGear(props.cat, [...brands.value]);
   emit('change');
 }
 function addPick() {
-  const brand = newBrand.value.trim();
-  if (!brand || brands.value.includes(brand)) { newBrand.value = ''; adding.value = false; return; }
-  brands.value.push(brand);
+  const b = newBrand.value.trim();
+  if (!b || brands.value.includes(b)) { newBrand.value = ''; return; }
+  brands.value.push(b);
   newBrand.value = '';
   save();
-  adding.value = false; // 保存后收起输入框
+  adding.value = false;
 }
 function removePick(i: number) {
   brands.value.splice(i, 1);
@@ -40,7 +40,7 @@ function removePick(i: number) {
       <button class="gcancel" @click="adding = false">取消</button>
     </div>
     <div class="gearactions">
-      <button v-if="!adding" class="gaction" @click="adding = !adding">{{ adding ? '取消' : '＋ 添加品牌' }}</button>
+      <button v-if="!adding" class="gaction" @click="adding = !adding">＋ 添加品牌</button>
       <span class="gearfoot">个人偏好 · 非商业推荐</span>
     </div>
   </div>

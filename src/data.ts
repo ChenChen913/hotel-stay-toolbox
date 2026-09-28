@@ -93,13 +93,13 @@ export function defaultQty(item: ItemDef, c: Conditions): number {
 
 export const CAT_ORDER = ['证件', '洗漱', '衣物', '出行', '卫生', '睡眠', '驱蚊', '电子', '安全', '适老', '儿童', '健康', '长住', '补给', '自定义'];
 
-// —— 好物收藏（只记品牌；⚪ 个人偏好，非商业推荐；默认为空，用户自行添加）——
-// 仅保留两组作为测试数据
+// —— 好物收藏（按类别；⚪ 个人偏好，非商业推荐；默认仅测试数据，用户自行添加）——
+// 类别唯一来源 = CAT_ORDER（清单类别）+「其他」兜底；清单加类别，好物自动识别
+export const GEAR_CATS: string[] = [...CAT_ORDER.filter(c => c !== '自定义'), '其他'];
 export const GEAR_SEED: Record<string, string[]> = {
-  shower_filter: ['复旦申花（便携过滤款）'],
-  flashlight: ['小型可充电手电筒'],
-  earplugs:    ['安耳悠'],
-  gan_charger: ['摩米士（小魔方）'],
+  睡眠: ['安耳悠'],
+  电子: ['摩米士（小魔方）'],
+  安全: ['小型可充电手电筒'],
 };
 
 // —— 固定检查清单（docs/规则表.md §4）——
