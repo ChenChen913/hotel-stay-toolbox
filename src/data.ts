@@ -144,17 +144,19 @@ export const CHECKLISTS: Record<'checkin' | 'checkout', Checklist> = {
 // —— 知识条目（44 条，全部来自三份核查文档的已核实结论）——
 // evidence: law 官方法规 / official 官方建议 / pro 专业机构 / experience 个人经验
 // risk: high 立即处理 / mid 建议检查 / low 普通注意
-export const EVIDENCE_META: Record<string, { label: string; tone: 'blue' | 'green' | 'gold' | 'gray' }> = {
+// 两个维度刻意做到「零重色」：证据用 蓝/绿/紫/灰，风险用 红/橙/石板灰。
+// 再叠加形状差异（证据=方块，风险=圆点），同屏出现也不会混淆。
+export const EVIDENCE_META: Record<string, { label: string; tone: 'blue' | 'green' | 'purple' | 'gray' }> = {
   law:        { label: '官方法规',   tone: 'blue' },
   official:   { label: '官方建议',   tone: 'green' },
-  pro:        { label: '专业机构',   tone: 'gold' },
+  pro:        { label: '专业机构',   tone: 'purple' },
   experience: { label: '个人经验',   tone: 'gray' },
 };
 
-export const RISK_META: Record<string, { label: string; tone: 'red' | 'gold' | 'green' }> = {
+export const RISK_META: Record<string, { label: string; tone: 'red' | 'orange' | 'slate' }> = {
   high: { label: '立即处理', tone: 'red' },
-  mid:  { label: '建议检查', tone: 'gold' },
-  low:  { label: '普通注意', tone: 'green' },
+  mid:  { label: '建议检查', tone: 'orange' },
+  low:  { label: '普通注意', tone: 'slate' },
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -333,7 +335,7 @@ export const DISCLAIMER = {
   lines: [
     '**本工具箱不构成医疗、法律或专业安全意见**：健康问题请咨询医生，权益争议请咨询专业法律人士或官方渠道。',
     '**所有检测类方法都只是辅助观察**，不能证明房间绝对安全。',
-    '**⚪ 个人经验与 🟡 专业机构内容不代表官方要求**，请勿与 🔵 官方法规等同看待。',
+    '**个人经验与专业机构内容不代表官方要求**，请勿与官方法规等同看待（等级见下方图例）。',
     '**法规与热线会更新**，请以最新官方发布为准。',
   ],
   triggers: '**「立即处理」的典型情形**：疑似偷拍设备、门锁损坏无法反锁、疏散通道被堵塞、房内有明火或焦糊味、有人强行进入房间。',

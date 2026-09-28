@@ -13,6 +13,11 @@
   --red: #b23a32;
   --green: #3f7d54;
   --blue: #3a6ea5;
+  /* 证据/风险两个维度必须完全不重色：紫、橙、石板灰是新增的第三/四/五色 */
+  --purple: #7361a8;
+  --orange: #cf7a2c;
+  --slate: #5f7d8c;
+  --amber: #b45309;
   --glass: rgba(255, 255, 255, 0.55);
   --glass-border: rgba(255, 255, 255, 0.65);
   --hairline: rgba(35, 41, 37, 0.08);
@@ -182,13 +187,18 @@ textarea.field, input.field { width: 100%; }
 .tag.opt  { background: rgba(35, 41, 37, 0.06); color: var(--ink-2); border-color: var(--hairline); }
 .tag.src  { background: rgba(58, 110, 165, 0.1); color: var(--blue); border-color: rgba(58, 110, 165, 0.22); }
 
-/* —— 色点（替代 emoji 等级标记）—— */
+/* —— 等级标记：圆点=风险等级，方块=证据等级（两个维度靠形状+颜色双重区分）—— */
 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .dot.red { background: var(--red); box-shadow: 0 0 0 3px rgba(178, 58, 50, 0.15); }
 .dot.gold { background: var(--gold); box-shadow: 0 0 0 3px rgba(169, 133, 61, 0.15); }
 .dot.green { background: var(--green); box-shadow: 0 0 0 3px rgba(63, 125, 84, 0.15); }
 .dot.blue { background: var(--blue); box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.15); }
 .dot.gray { background: var(--ink-3); box-shadow: 0 0 0 3px rgba(166, 173, 165, 0.18); }
+.dot.purple { background: var(--purple); box-shadow: 0 0 0 3px rgba(115, 97, 168, 0.16); }
+.dot.orange { background: var(--orange); box-shadow: 0 0 0 3px rgba(207, 122, 44, 0.16); }
+.dot.slate { background: var(--slate); box-shadow: 0 0 0 3px rgba(95, 125, 140, 0.16); }
+/* 方块变体：证据等级专用，缩小一点让轮廓在 9px 尺寸下也能一眼分辨 */
+.dot.sq { width: 8px; height: 8px; border-radius: 2px; margin: 0.5px; }
 
 /* —— 分段页签 —— */
 .seg { display: flex; padding: 4px; gap: 4px; border-radius: 15px; background: rgba(35, 41, 37, 0.06); border: 1px solid var(--hairline); }

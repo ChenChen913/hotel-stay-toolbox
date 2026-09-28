@@ -10,7 +10,7 @@ import type { Stage } from '../types';
 const props = defineProps<{ stage: Exclude<Stage, 'prep'> }>();
 // computed：切换页签时组件被复用，清单必须跟随 stage 变化
 const checklist = computed(() => CHECKLISTS[props.stage]);
-const RISK_TONE = { high: 'red', mid: 'gold', low: 'green' } as const;
+const RISK_TONE = { high: 'red', mid: 'orange', low: 'slate' } as const;
 const stay = () => currentStay.value!;
 
 function doneCount(): number {
