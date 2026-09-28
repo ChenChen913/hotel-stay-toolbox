@@ -4,11 +4,15 @@ import type { CheckGroup, Checklist, Conditions, CustomHint, ItemDef, KnowledgeE
 
 export const ITEMS: ItemDef[] = [
   // —— 基础必备（恒真）——
-  { id: 'id_card',    name: '身份证/护照',   cat: '证件', users: 'adult',  prep: '必带',     unit: '份', when: () => true },
-  { id: 'phone',      name: '手机/钱包',     cat: '证件', users: 'adult',  prep: '必带',     unit: '份', when: () => true },
-  { id: 'charger',    name: '充电器+数据线', cat: '电子', users: 'adult',  prep: '必带',     unit: '套', when: () => true },
+  { id: 'id_card',    name: '身份证',        cat: '证件', users: 'adult',  prep: '必带',     unit: '份', when: () => true },
+  { id: 'passport',   name: '护照（出境才需要）', cat: '证件', users: 'adult',  prep: '可选',     unit: '份', when: () => true },
+  { id: 'phone',      name: '手机',          cat: '证件', users: 'adult',  prep: '必带',     unit: '台', when: () => true },
+  { id: 'wallet',     name: '钱包',          cat: '证件', users: 'adult',  prep: '必带',     unit: '个', when: () => true },
+  { id: 'charger',    name: '充电器',        cat: '电子', users: 'adult',  prep: '必带',     unit: '个', when: () => true },
+  { id: 'cable',      name: '数据线',        cat: '电子', users: 'adult',  prep: '必带',     unit: '根', when: () => true },
   { id: 'powerbank',  name: '充电宝',        cat: '电子', users: 'adult',  prep: '推荐',     unit: '个', when: () => true },
-  { id: 'toothbrush', name: '牙刷/牙膏',     cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '套', when: () => true },
+  { id: 'toothbrush', name: '牙刷',          cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '支', when: () => true },
+  { id: 'toothpaste', name: '牙膏',          cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '支', when: () => true },
   { id: 'towel',      name: '毛巾/压缩毛巾', cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '条', when: () => true },
   { id: 'slippers',   name: '拖鞋',          cat: '洗漱', users: 'adult',  prep: '家里带',   unit: '双', when: () => true },
   { id: 'shower_filter', name: '便携过滤花洒', cat: '洗漱', users: 'adult',  prep: '可选',     unit: '个', when: () => true },
@@ -28,7 +32,9 @@ export const ITEMS: ItemDef[] = [
     gear: [{ name: '阻门器（通用款）', note: '有效的额外防护，但不能替代反锁与门链' }] },
 
   // —— 衣物（数量 = 人数 × 天数，可整体增删改；打包原则见知识库「衣物打包」）——
-  { id: 'underwear',  name: '内衣裤+袜子（每天一套）', cat: '衣物', users: 'adult', prep: '家里带', unit: '套',
+  { id: 'underwear',  name: '内衣裤（每天一套）', cat: '衣物', users: 'adult', prep: '家里带', unit: '套',
+    qty: c => c.adults * (c.nights + 1), when: () => true },
+  { id: 'socks',      name: '袜子（每天一双）', cat: '衣物', users: 'adult', prep: '家里带', unit: '双',
     qty: c => c.adults * (c.nights + 1), when: () => true },
   { id: 'tops',       name: '换洗上衣', cat: '衣物', users: 'adult', prep: '家里带', unit: '件',
     qty: c => c.adults * Math.min(c.nights + 1, 4), when: () => true },
@@ -61,8 +67,9 @@ export const ITEMS: ItemDef[] = [
   { id: 'diapers',    name: '纸尿裤', cat: '儿童', users: 'child',  prep: '建议购买', unit: '片', qty: c => c.children * (c.nights + 1), when: c => c.children > 0 && c.childAge === '0-3' },
   { id: 'baby_wipes', name: '婴儿湿巾', cat: '儿童', users: 'child',  prep: '建议购买', unit: '包', qty: c => c.children, when: c => c.children > 0 && c.childAge === '0-3' },
   { id: 'thermos',    name: '恒温水壶（需自动断电）', cat: '儿童', users: 'shared', prep: '家里带',  unit: '个', when: c => c.children > 0 && c.childAge === '0-3' },
-  { id: 'bed_rail',   name: '床围挡/枕头阵', cat: '儿童', users: 'shared', prep: '可选', unit: '套', when: c => c.children > 0 && (c.childAge === '0-3' || c.childAge === '4-6') },
-  { id: 'kids_set',   name: '儿童牙刷/拖鞋', cat: '儿童', users: 'child',  prep: '家里带', unit: '套', qty: c => c.children, when: c => c.children > 0 },
+  { id: 'bed_rail',   name: '床围挡（幼儿防摔）', cat: '儿童', users: 'shared', prep: '可选', unit: '套', when: c => c.children > 0 && (c.childAge === '0-3' || c.childAge === '4-6') },
+  { id: 'kids_toothbrush', name: '儿童牙刷', cat: '儿童', users: 'child',  prep: '家里带', unit: '支', qty: c => c.children, when: c => c.children > 0 },
+  { id: 'kids_slippers',   name: '儿童拖鞋', cat: '儿童', users: 'child',  prep: '家里带', unit: '双', qty: c => c.children, when: c => c.children > 0 },
 
   // —— 长住 ——
   { id: 'laundry',     name: '洗衣片/便携洗衣液', cat: '长住', users: 'shared', prep: '建议购买', unit: '份', when: c => c.nights >= 4 },
@@ -74,7 +81,8 @@ export const ITEMS: ItemDef[] = [
 
   // —— 到店购买（抵达后本地补给）——
   { id: 'bottled_water', name: '大桶矿泉水（烧水/刷牙）', cat: '补给', users: 'shared', prep: '到店购买', unit: '桶', when: () => true },
-  { id: 'tissue',        name: '抽纸/湿厕纸', cat: '补给', users: 'shared', prep: '到店购买', unit: '包', when: () => true },
+  { id: 'tissue',        name: '抽纸',        cat: '补给', users: 'shared', prep: '到店购买', unit: '包', when: () => true },
+  { id: 'wet_toilet_paper', name: '湿厕纸',  cat: '补给', users: 'shared', prep: '到店购买', unit: '包', when: () => true },
 ];
 
 // 默认数量：按使用人数算（每人一份=人数，儿童=儿童数，共用=1）；有自定义 qty 函数的按函数

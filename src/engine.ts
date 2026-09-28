@@ -1,5 +1,5 @@
 // engine.ts — 规则求值 + 行程存储 + 备份。纯逻辑，不依赖 Vue/DOM；node 测试用内存 Storage。
-import type { Conditions, PrepItem, Stay } from './types';
+import type { Conditions, Guest, PrepItem, Stay } from './types';
 import { CAT_ORDER, CHECKLISTS, GEAR_SEED, ITEMS, defaultQty } from './data';
 
 // localStorage 在 node/Vitest 里不存在 → 内存兜底
@@ -46,7 +46,7 @@ export function sortItems(items: PrepItem[]): PrepItem[] {
 
 // —— 行程存取 ——
 export function listStays(): Stay[] {
-  return JSON.parse(Storage.getItem(STORE_KEY) || '[]') as Stay[];
+  return (JSON.parse(Storage.getItem(STORE_KEY) || '[]') as Stay[]).map(ensureGuests);
 }
 export function saveStay(stay: Stay): Stay {
   const all = listStays();
@@ -61,6 +61,21 @@ export function getStay(id: string): Stay | null {
 export function deleteStay(id: string): void {
   Storage.setItem(STORE_KEY, JSON.stringify(listStays().filter(s => s.id !== id)));
 }
+/** 按 conditions 生成默认入住人（成人 N + 儿童 N + 老人） */
+export function buildGuests(c: Conditions): Guest[] {
+  const out: Guest[] = [];
+  for (let i = 1; i <= c.adults; i++) out.push({ id: `guest_a${i}`, kind: 'adult', label: `入住人${i}` });
+  for (let i = 1; i <= c.children; i++) out.push({ id: `guest_c${i}`, kind: 'child', label: c.children === 1 ? '儿童' : `儿童${i}`, childAge: c.childAge });
+  if (c.elderly) out.push({ id: 'guest_e1', kind: 'elderly', label: '老人' });
+  return out;
+}
+
+/** 旧数据迁移：无 guests 的行程按 conditions 补齐（assign 旧文案与新 label 兼容） */
+export function ensureGuests(s: Stay): Stay {
+  if (!Array.isArray(s.guests)) s.guests = buildGuests(s.conditions);
+  return s;
+}
+
 export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
   // JSON 深拷贝：入参可能是 Vue 响应式代理，structuredClone 无法克隆 Proxy
   const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -69,6 +84,7 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
     createdAt: new Date().toISOString(),
     date: conditions.date || '',
     nights: conditions.nights,
+    guests: buildGuests(conditions),
     conditions: clone(conditions),
     prep: clone(prepItems),
     custom: [],

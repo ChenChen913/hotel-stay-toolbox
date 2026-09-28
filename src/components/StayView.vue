@@ -22,10 +22,8 @@ const prepGroups = computed(() => {
 // 使用人选项（聊04）：≥2 名成人或带儿童时出现，物品可绑定到人
 const assignOptions = computed(() => {
   const s = stay();
-  const opts = ['全体'];
-  for (let i = 1; i <= s.conditions.adults; i++) opts.push(`入住人${i}`);
-  if (s.conditions.children > 0) opts.push('儿童');
-  return opts.length > 2 ? opts : (s.conditions.children > 0 ? opts : null);
+  const opts = ['全体', ...s.guests.map(g => g.label)];
+  return opts.length > 1 ? opts : null;
 });
 const stageHint = computed(() => {
   const s = stay();

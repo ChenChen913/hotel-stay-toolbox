@@ -144,10 +144,16 @@ function save() {
     <h2 class="q">这次有几个人入住？</h2>
     <div class="glass card">
       <div class="chips">
-        <button v-for="n in [1, 2, 3]" :key="n" class="chip" :class="{ on: draft.adults === n }" @click="draft.adults = n">
+        <button v-for="n in [1, 2, 3]" :key="n" class="chip" :class="{ on: draft.adults === n || (n === 3 && draft.adults > 3) }" @click="draft.adults = Math.max(draft.adults, n)">
           <Users :size="16" />{{ n === 3 ? '3 人及以上' : `${n} 人` }}
         </button>
       </div>
+      <template v-if="draft.adults >= 3">
+        <p class="fxline">几人入住就按几人准备，请确认真实人数</p>
+        <div class="nights">
+          <Stepper v-model="draft.adults" :min="3" :max="10" unit="人" />
+        </div>
+      </template>
     </div>
   </template>
 

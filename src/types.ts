@@ -53,6 +53,13 @@ export interface PrepItem {
   assign?: string;
 }
 
+export interface Guest {
+  id: string;
+  kind: 'adult' | 'child' | 'elderly';
+  label: string;
+  childAge?: ChildAge;
+}
+
 export type RiskLevel = 'high' | 'mid' | 'low';
 
 export interface CheckGroup {
@@ -94,6 +101,7 @@ export interface CustomHint {
 
 export interface Stay {
   id: string;
+  guests: Guest[];
   createdAt: string;
   date: string;
   nights: number;

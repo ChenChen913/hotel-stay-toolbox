@@ -1,7 +1,7 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
 import { describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
-import { buildPrep, exportData, getStay, importData, listGear, listStays, newStay, saveGear, saveStay } from '../src/engine';
+import { buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, newStay, saveGear, saveStay, Storage, STORE_KEY } from '../src/engine';
 import { suggestedStage } from '../src/store';
 import type { Conditions, PrepItem } from '../src/types';
 
@@ -150,6 +150,36 @@ describe('按日期自动定位阶段', () => {
     yesterday.setDate(today.getDate() - 1);
     expect(suggestedStage(mk(dstr(yesterday), 1))).toBe('checkout');
     expect(suggestedStage({ ...mk('', 3), date: '' })).toBe('prep');
+  });
+});
+
+
+describe('Guest 轻量模型', () => {
+  it('newStay 按条件生成入住人（成人/儿童/老人）', () => {
+    const s = newStay({ ...base, adults: 2, children: 1, childAge: '0-3', elderly: true }, []);
+    expect(s.guests.length).toBe(4);
+    expect(s.guests[0]).toMatchObject({ kind: 'adult', label: '入住人1' });
+    expect(s.guests[2]).toMatchObject({ kind: 'child', label: '儿童', childAge: '0-3' });
+    expect(s.guests[3].kind).toBe('elderly');
+  });
+  it('多个儿童时标签带序号', () => {
+    const s = newStay({ ...base, children: 2 }, []);
+    expect(s.guests.filter(g => g.kind === 'child').map(g => g.label)).toEqual(['儿童1', '儿童2']);
+  });
+  it('旧数据（无 guests）保存后读入时自动迁移', () => {
+    const legacy = JSON.parse(JSON.stringify(newStay(base, buildPrep(base))));
+    delete legacy.guests;
+    legacy.id = 'legacy_stay_1';
+    Storage.setItem(STORE_KEY, JSON.stringify([legacy]));
+    expect(getStay('legacy_stay_1')!.guests.length).toBe(base.adults);
+  });
+});
+
+describe('真实人数（3人及以上不再压缩为 3）', () => {
+  it('4 个成人 → 每人份物品按 4 份', () => {
+    const p = buildPrep({ ...base, adults: 4 });
+    expect(p.find(i => i.name === '身份证')!.qty).toBe(4);
+    expect(p.find(i => i.name === '拖鞋')!.qty).toBe(4);
   });
 });
 

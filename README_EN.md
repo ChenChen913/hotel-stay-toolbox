@@ -52,7 +52,7 @@ Open <http://localhost:5173/hotel-toolbox/>.
 The main flow has five steps:
 
 1. Click "创建一次入住" (create a stay) on the home page and answer 5 short questions (dates and nights, guests, companions, purpose, preferences)
-2. The app generates a packing list from 36 item rules; quantities are derived from guests and nights, and each item is tagged as "must bring / buy / bring from home"
+2. The app generates a packing list (guest count is exact, up to 10) from 36 item rules; quantities are derived from guests and nights, and each item is tagged as "must bring / buy / bring from home"
 3. Check items off, adjust quantities, or add custom items (camera, medication, etc.)
 4. At the hotel, run the 15-item check-in check (fire observations and emergency supplies included); before leaving, run the 14-item checkout check
 5. The knowledge section holds 44 entries with evidence levels and sources across pre-trip, fire safety, privacy, hygiene, consumer rights and special scenarios, with a disclaimer up top, one-tap copy for emergency phrasing, a quick emergency button on the stay page and review reminders on time-sensitive law entries
@@ -109,7 +109,8 @@ A: The design settles on fixed rules: they are explainable, testable and work of
 
 - Stay data lives in browser localStorage: clearing browser data deletes it. Use the backup/export card on the home page to save a JSON backup and import it back
 - Season is not inferred automatically; users tick "mosquito season" in the questionnaire. Destination weather is not integrated
-- Quantity formulas are simplified rules (guests × (nights + 1)); adjust manually in the list
+- Quantities are suggestions (guests × (nights + 1) etc.), adjustable per item; items like wipes cannot be derived from headcount, adjust manually
+- V1.2 roadmap (from external review): full purchase-status loop (to buy / bought / already at home), independent age per child (full Guest model), desktop two-column layout
 
 ## Contributing
 
