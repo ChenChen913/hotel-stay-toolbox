@@ -212,7 +212,7 @@ function save() {
 }
 .qchip.on { border-color: var(--pine); background: rgba(28, 90, 74, 0.1); color: var(--pine-deep); font-weight: 650; }
 .dslot {
-  margin: 4px 0 6px; padding: 12px 10px 10px;
+  margin: 4px 0 16px; padding: 12px 10px 10px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.42);
   border: 1px solid var(--hairline);

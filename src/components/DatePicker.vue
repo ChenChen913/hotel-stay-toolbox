@@ -81,7 +81,7 @@ const isPast = (s: string) => !!s && s < todayStr;
 .dpk-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
 .dpk-day {
   position: relative;
-  aspect-ratio: 1 / 1; min-height: 38px;
+  aspect-ratio: 1 / 1; min-height: 42px;
   display: flex; align-items: center; justify-content: center;
   border: 1px solid transparent; border-radius: 12px; cursor: pointer;
   background: transparent; color: var(--ink);
