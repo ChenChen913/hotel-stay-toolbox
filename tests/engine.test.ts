@@ -1,7 +1,7 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
-import { buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, migrateItemKeyGear, newStay, saveGear, saveStay, Storage, STORE_KEY } from '../src/engine';
+import { addGear, buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, migrateCategoryKeyGear, migrateItemKeyGear, newStay, removeGear, resetGear, saveStay, Storage, STORE_KEY } from '../src/engine';
 import { suggestedStage } from '../src/store';
 import type { Conditions, PrepItem } from '../src/types';
 
@@ -10,6 +10,11 @@ const base: Conditions = {
   purpose: '旅游', prefs: { sleep: false, hygiene: false, mosquito: false, gadgets: false },
 };
 const get = (list: PrepItem[], part: string) => list.find(i => i.name.includes(part));
+
+// 每个用例从干净存储开始，避免用例间互相污染（好物有 3 个版本键）
+beforeEach(() => {
+  ['htb_stays_v1', 'htb_gear_v3', 'htb_gear_v4', 'htb_gear_v5'].forEach(k => Storage.removeItem(k));
+});
 
 describe('规则引擎 buildPrep', () => {
   it('基础清单：证件必带、数量按人数、消耗品按晚冗余', () => {
@@ -64,7 +69,8 @@ describe('规则引擎 buildPrep', () => {
 });
 
 describe('数据完整性', () => {
-  it('ITEMS id 无重复、分类可排序', () => {
+  it('ITEMS 56 条、id 无重复、分类可排序', () => {
+    expect(ITEMS.length).toBe(56);
     const ids = ITEMS.map(i => i.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(ITEMS.every(i => CAT_ORDER.includes(i.cat))).toBe(true);
@@ -125,20 +131,86 @@ describe('行程存取', () => {
   });
 });
 
-describe('好物收藏存储（按类别，v4）', () => {
-  it('种子按类别返回，saveGear 覆盖后可读回', () => {
-    expect(listGear('睡眠')).toEqual(['安耳悠']);
-    expect(listGear('洗漱')).toEqual([]);
-    saveGear('洗漱', ['全棉时代']);
-    expect(listGear('洗漱')).toEqual(['全棉时代']);
-    saveGear('洗漱', []);
-    expect(listGear('洗漱')).toEqual([]);
+describe('好物收藏存储（物品名称 + 品牌，v5）', () => {
+  const GEAR_KEY = 'htb_gear_v5';
+
+  it('种子自带物品名称：只写品牌看不出这是什么', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    resetGear();
+    const seed = listGear();
+    expect(seed.length).toBeGreaterThan(0);
+    expect(seed.every(g => g.name && g.cat)).toBe(true);
+    expect(seed.find(g => g.brand === '安耳悠')!.name).toBe('耳塞');
   });
-  it('v3 按物品键的旧数据自动迁移为类别键', () => {
+  it('addGear 追加并可读回；同一物品可记多个品牌；完全重复不重复添加', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    addGear({ name: '充电宝', brand: '小米', cat: '电子' });
+    addGear({ name: '充电宝', brand: '罗马仕', cat: '电子' });
+    addGear({ name: '充电宝', brand: '小米', cat: '电子' });
+    const power = listGear('电子');
+    expect(power.length).toBe(2);
+    expect(power.map(g => g.brand)).toEqual(['小米', '罗马仕']);
+    expect(power.every(g => g.name === '充电宝')).toBe(true);
+  });
+  it('品牌可空：只记物品不记品牌', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    addGear({ name: '拖鞋', cat: '洗漱' });
+    expect(listGear('洗漱')[0]).toMatchObject({ name: '拖鞋', cat: '洗漱' });
+    expect(listGear('洗漱')[0].brand).toBeUndefined();
+  });
+  it('removeGear 按下标删除（GearView 的实际用法）', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    addGear({ name: '耳塞', brand: 'A', cat: '睡眠' });
+    addGear({ name: '耳塞', brand: 'B', cat: '睡眠' });
+    removeGear(0);
+    expect(listGear('睡眠').map(g => g.brand)).toEqual(['B']);
+  });
+  it('同一物品的每个品牌都各自成条、都带名称（不合并、不丢品牌）', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    addGear({ name: '充电宝', brand: '小米', cat: '电子' });
+    addGear({ name: '充电宝', brand: '罗马仕', cat: '电子' });
+    const rows = listGear('电子');
+    expect(rows.map(g => `${g.name} · ${g.brand}`)).toEqual(['充电宝 · 小米', '充电宝 · 罗马仕']);
+    expect(rows.every(g => g.name === '充电宝')).toBe(true);
+  });
+  it('listGear() 不带参数返回全部，带参数按分类过滤', () => {
+    Storage.setItem(GEAR_KEY, JSON.stringify([]));
+    addGear({ name: '耳塞', brand: 'A', cat: '睡眠' });
+    addGear({ name: '充电宝', brand: 'B', cat: '电子' });
+    expect(listGear().length).toBe(2);
+    expect(listGear('睡眠').length).toBe(1);
+    expect(listGear('安全')).toEqual([]);
+  });
+  it('v4 按类别存品牌 → 自动迁移为条目，品牌保留、名称回落为类别名', () => {
+    Storage.removeItem(GEAR_KEY);
+    Storage.setItem('htb_gear_v4', JSON.stringify({ 睡眠: ['安耳悠'], 电子: ['摩米士'] }));
+    const migrated = listGear();
+    expect(migrated).toEqual([
+      { name: '睡眠', brand: '安耳悠', cat: '睡眠' },
+      { name: '电子', brand: '摩米士', cat: '电子' },
+    ]);
+    // 迁移结果已落盘：v4 键不再参与后续读取
+    expect(JSON.parse(Storage.getItem(GEAR_KEY)!)).toEqual(migrated);
+  });
+  it('v3 按物品 id 的旧数据经 v4 中转迁移（物品归入其分类）', () => {
+    Storage.removeItem(GEAR_KEY);
+    Storage.removeItem('htb_gear_v4');
     Storage.setItem('htb_gear_v3', JSON.stringify({ towel: ['全棉时代'], unknown_gadget: ['某品牌'] }));
-    const migrated = migrateItemKeyGear(JSON.parse(Storage.getItem('htb_gear_v3')!));
-    expect(migrated['洗漱']).toContain('全棉时代');
-    expect(migrated['其他']).toContain('某品牌');
+    const migrated = listGear();
+    expect(migrated.find(g => g.brand === '全棉时代')!.cat).toBe('洗漱');
+    expect(migrated.find(g => g.brand === '某品牌')!.cat).toBe('其他');
+  });
+  it('migrateCategoryKeyGear：一个类别下多个品牌展开为多条', () => {
+    expect(migrateCategoryKeyGear({ 电子: ['A', 'B'] })).toEqual([
+      { name: '电子', brand: 'A', cat: '电子' },
+      { name: '电子', brand: 'B', cat: '电子' },
+    ]);
+    expect(migrateCategoryKeyGear({})).toEqual([]);
+  });
+  it('存储损坏（非数组）时不抛错，回落种子', () => {
+    Storage.setItem(GEAR_KEY, '{"电子":["小米"]}');
+    expect(listGear().length).toBeGreaterThan(0);
+    expect(listGear()[0].name).toBeTruthy();
   });
 });
 
@@ -197,6 +269,17 @@ describe('数据备份', () => {
     expect(parsed.app).toBe('hotel-toolbox');
     const r = importData(json);
     expect(r.stays).toBe(listStays().length);
+    expect(r.gear).toBe(listGear().length);
     expect(() => importData('{"app":"other"}')).toThrow();
+  });
+  it('导入旧版备份（gear 是「类别 → 品牌」对象）也能读入', () => {
+    const legacy = JSON.stringify({
+      app: 'hotel-toolbox',
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      stays: [],
+      gear: { 睡眠: ['安耳悠'] },
+    });
+    expect(importData(legacy).gear).toBe(1);
+    expect(listGear()[0]).toMatchObject({ name: '睡眠', brand: '安耳悠', cat: '睡眠' });
   });
 });

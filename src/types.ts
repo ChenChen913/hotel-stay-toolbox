@@ -99,6 +99,13 @@ export interface CustomHint {
   text: string;
 }
 
+/** 好物收藏：一条 = 一个具体物品 + 可选品牌（展示为「物品名称 + 品牌」） */
+export interface GearEntry {
+  name: string;   // 物品名称，如「充电宝」
+  brand?: string; // 品牌，可空（只记物品不记品牌）
+  cat: string;    // 分类，取自 CAT_ORDER，用于分组展示
+}
+
 export interface Stay {
   id: string;
   guests: Guest[];

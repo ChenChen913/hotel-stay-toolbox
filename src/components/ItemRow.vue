@@ -24,9 +24,9 @@ const tagCls = computed(() => TAG_CLS[props.item.prep] ?? 'opt');
 
 // —— 好物收藏入口（编辑面板在 GearPanel）——
 const showGear = ref(false);
-const gearCount = ref(listGear(props.item.cat).length);
+const gearCount = ref(listGear(props.item.cat).filter(g => g.name === props.item.name).length);
 function onGearChange() {
-  gearCount.value = listGear(props.item.cat).length;
+  gearCount.value = listGear(props.item.cat).filter(g => g.name === props.item.name).length;
 }
 function onQty(v: number) {
   props.item.qty = v;
@@ -60,7 +60,7 @@ function onAssign(e: Event) {
     <Stepper :model-value="props.item.qty" :min="0" :unit="props.item.unit" @update:model-value="onQty" />
     <button v-if="props.removable" class="del" aria-label="删除" @click="emit('remove')"><Trash2 :size="16" /></button>
 
-    <GearPanel v-if="showGear" :cat="props.item.cat" @change="onGearChange" />
+    <GearPanel v-if="showGear" :name="props.item.name" :cat="props.item.cat" @change="onGearChange" />
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 // engine.ts — 规则求值 + 行程存储 + 备份。纯逻辑，不依赖 Vue/DOM；node 测试用内存 Storage。
-import type { Conditions, Guest, PrepItem, Stay } from './types';
+import type { Conditions, GearEntry, Guest, PrepItem, Stay } from './types';
 import { CAT_ORDER, CHECKLISTS, GEAR_CATS, GEAR_SEED, ITEMS, defaultQty } from './data';
 
 // localStorage 在 node/Vitest 里不存在 → 内存兜底
@@ -21,8 +21,9 @@ export const Storage: MiniStorage =
 
 export { GEAR_CATS } from './data';
 export const STORE_KEY = 'htb_stays_v1';
-const GEAR_KEY = 'htb_gear_v4';
-const GEAR_LEGACY_KEY = 'htb_gear_v3';
+const GEAR_KEY = 'htb_gear_v5';
+const GEAR_V4_KEY = 'htb_gear_v4';
+const GEAR_V3_KEY = 'htb_gear_v3';
 
 // 条件 → 物品清单（含数量与准备方式）
 export function buildPrep(c: Conditions): PrepItem[] {
@@ -95,22 +96,34 @@ export function newStay(conditions: Conditions, prepItems: PrepItem[]): Stay {
   };
 }
 
-// —— 好物收藏：按类别记品牌；种子仅测试数据，用户数据存 v4，旧 v3（按物品）读入时自动迁移 ——
-function gearOverrides(): Record<string, string[]> {
-  let cur = Storage.getItem(GEAR_KEY);
-  if (cur === null) {
-    const legacy = Storage.getItem(GEAR_LEGACY_KEY);
-    if (legacy !== null) {
-      const migrated = migrateItemKeyGear(JSON.parse(legacy) as Record<string, string[]>);
-      Storage.setItem(GEAR_KEY, JSON.stringify(migrated));
-      return migrated;
-    }
-    return {};
+// —— 好物收藏：一条 = 物品名称 + 品牌（⚪ 个人偏好，非商业推荐）——
+// 存储 v5：[{ name, brand?, cat }]。旧 v4（类别 → 品牌）与 v3（物品 id → 品牌）读入时自动迁移。
+function gearList(): GearEntry[] {
+  const cur = Storage.getItem(GEAR_KEY);
+  if (cur !== null) {
+    try {
+      const parsed = JSON.parse(cur) as unknown;
+      if (Array.isArray(parsed)) return parsed as GearEntry[];
+    } catch { /* 存储损坏时回落到种子 */ }
   }
-  return JSON.parse(cur) as Record<string, string[]>;
+  const v4 = Storage.getItem(GEAR_V4_KEY);
+  if (v4 !== null) {
+    const migrated = migrateCategoryKeyGear(JSON.parse(v4) as Record<string, string[]>);
+    Storage.setItem(GEAR_KEY, JSON.stringify(migrated));
+    return migrated;
+  }
+  const v3 = Storage.getItem(GEAR_V3_KEY);
+  if (v3 !== null) {
+    const migrated = migrateCategoryKeyGear(
+      migrateItemKeyGear(JSON.parse(v3) as Record<string, string[]>),
+    );
+    Storage.setItem(GEAR_KEY, JSON.stringify(migrated));
+    return migrated;
+  }
+  return GEAR_SEED.map(g => ({ ...g }));
 }
 
-/** v3（键=物品 id）→ v4（键=类别）：物品归入其分类，未知物品归「其他」 */
+/** v3（键=物品 id）→ 类别键：物品归入其分类，未知物品归「其他」 */
 export function migrateItemKeyGear(old: Record<string, string[]>): Record<string, string[]> {
   const out: Record<string, string[]> = {};
   for (const [itemId, brands] of Object.entries(old)) {
@@ -120,13 +133,40 @@ export function migrateItemKeyGear(old: Record<string, string[]>): Record<string
   return out;
 }
 
-export function listGear(cat: string): string[] {
-  return gearOverrides()[cat] ?? GEAR_SEED[cat] ?? [];
+/** v4（类别 → 品牌）→ v5 条目：品牌保留，物品名称回退为类别名 */
+export function migrateCategoryKeyGear(old: Record<string, string[]>): GearEntry[] {
+  const out: GearEntry[] = [];
+  for (const [cat, brands] of Object.entries(old)) {
+    for (const brand of brands) out.push({ name: cat, brand, cat });
+  }
+  return out;
 }
-export function saveGear(cat: string, brands: string[]): void {
-  const o = gearOverrides();
-  o[cat] = brands;
-  Storage.setItem(GEAR_KEY, JSON.stringify(o));
+
+export function listGear(cat?: string): GearEntry[] {
+  const all = gearList();
+  return cat ? all.filter(g => g.cat === cat) : all;
+}
+
+export function addGear(entry: GearEntry): GearEntry[] {
+  const list = gearList();
+  const dup = list.some(g => g.cat === entry.cat && g.name === entry.name && (g.brand ?? '') === (entry.brand ?? ''));
+  if (!dup) list.push(entry);
+  Storage.setItem(GEAR_KEY, JSON.stringify(list));
+  return list;
+}
+
+export function removeGear(index: number): GearEntry[] {
+  const list = gearList();
+  if (index >= 0 && index < list.length) list.splice(index, 1);
+  Storage.setItem(GEAR_KEY, JSON.stringify(list));
+  return list;
+}
+
+/** 恢复默认好物（清空用户改动，回到种子） */
+export function resetGear(): GearEntry[] {
+  const seed = GEAR_SEED.map(g => ({ ...g }));
+  Storage.setItem(GEAR_KEY, JSON.stringify(seed));
+  return seed;
 }
 
 // —— 数据备份：导出 / 导入（缓解 localStorage 清空即丢失的风险）——
@@ -134,17 +174,19 @@ export interface Backup {
   app: 'hotel-toolbox';
   exportedAt: string;
   stays: Stay[];
-  gear: Record<string, string[]>;
+  gear: GearEntry[];
 }
 export function exportData(): string {
-  return JSON.stringify({ app: 'hotel-toolbox', exportedAt: new Date().toISOString(), stays: listStays(), gear: gearOverrides() }, null, 2);
+  return JSON.stringify({ app: 'hotel-toolbox', exportedAt: new Date().toISOString(), stays: listStays(), gear: gearList() }, null, 2);
 }
 export function importData(text: string): { stays: number; gear: number } {
   const data = JSON.parse(text) as Partial<Backup>;
   if (data.app !== 'hotel-toolbox' || !Array.isArray(data.stays)) throw new Error('不是本工具箱的备份文件');
   const stays = data.stays.filter(s => s && typeof s.id === 'string' && Array.isArray(s.prep) && s.conditions);
   Storage.setItem(STORE_KEY, JSON.stringify(stays));
-  const gear = data.gear && typeof data.gear === 'object' ? migrateItemKeyGear(data.gear as Record<string, string[]>) : {};
+  const gear = Array.isArray(data.gear)
+    ? data.gear
+    : (data.gear && typeof data.gear === 'object' ? migrateCategoryKeyGear(data.gear as Record<string, string[]>) : []);
   Storage.setItem(GEAR_KEY, JSON.stringify(gear));
-  return { stays: stays.length, gear: Object.keys(gear).length };
+  return { stays: stays.length, gear: gear.length };
 }
