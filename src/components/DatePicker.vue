@@ -112,4 +112,23 @@ const isPast = (s: string) => !!s && s < todayStr;
 }
 .dpk-day.sel.today::after { background: #f4f1e8; }
 .dpk-day.sel:hover { background: linear-gradient(160deg, #256c59, var(--pine-deep)); }
+
+/* —— 桌面端放开：手机限宽防挤，桌面上跟着卡片铺开，格子与字号一起放大 ——
+   注意：只改高度/字号，绝不动 grid-template-columns 与 gap，
+   标头与日期格必须始终同轨，否则又会错位。 */
+@media (min-width: 560px) {
+  .dpk { max-width: none; padding: 6px 2px 0; }
+  .dpk-head { margin-bottom: 12px; }
+  .dpk-nav { width: 36px; height: 36px; border-radius: 11px; }
+  .dpk-title { font-size: 16.5px; }
+  .dpk-title b { font-size: 18.5px; }
+  .dpk-week { margin-bottom: 6px; }
+  .dpk-week span { font-size: 12.5px; padding: 4px 0; }
+  .dpk-day { min-height: 56px; font-size: 15.5px; border-radius: 13px; }
+  .dpk-day.today::after { bottom: 8px; width: 5px; height: 5px; }
+}
+@media (min-width: 700px) {
+  .dpk-day { min-height: 64px; font-size: 16px; }
+  .dpk-day.today::after { bottom: 10px; }
+}
 </style>
