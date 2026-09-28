@@ -3,3 +3,5 @@ dist/
 _shots/
 tsconfig.tsbuildinfo
 facts.md
+
+.workbuddy-ai/memory/
