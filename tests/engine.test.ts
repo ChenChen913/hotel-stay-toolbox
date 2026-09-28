@@ -1,6 +1,6 @@
 // 规则引擎自检（移植自 V1 test.js，断言不变）。运行：npm test
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CAT_ORDER, CHECKLISTS, ITEMS, KNOWLEDGE } from '../src/data';
+import { CAT_ORDER, CHECKLISTS, GEAR_CATS, GEAR_KEYWORDS, GEAR_TIE_BREAK, ITEMS, KNOWLEDGE, guessGearCat } from '../src/data';
 import { addGear, buildPrep, ensureGuests, exportData, getStay, importData, listGear, listStays, migrateCategoryKeyGear, migrateItemKeyGear, newStay, removeGear, resetGear, saveStay, Storage, STORE_KEY } from '../src/engine';
 import { suggestedStage } from '../src/store';
 import type { Conditions, PrepItem } from '../src/types';
@@ -258,6 +258,74 @@ describe('真实人数（3人及以上不再压缩为 3）', () => {
     const p = buildPrep({ ...base, adults: 4 });
     expect(p.find(i => i.name === '身份证')!.qty).toBe(4);
     expect(p.find(i => i.name === '拖鞋')!.qty).toBe(4);
+  });
+});
+
+describe('好物分类联想（按物品名称猜分类）', () => {
+  it('每个分类都有足够多的关键词，且不重复', () => {
+    const cats = CAT_ORDER.filter(c => c !== '自定义');
+    for (const c of cats) {
+      expect(GEAR_KEYWORDS[c], `缺分类 ${c}`).toBeDefined();
+      expect(GEAR_KEYWORDS[c].length, `${c} 关键词太少`).toBeGreaterThanOrEqual(10);
+      expect(new Set(GEAR_KEYWORDS[c]).size, `${c} 有重复关键词`).toBe(GEAR_KEYWORDS[c].length);
+    }
+    // 覆盖度：关键词总数（覆盖面够宽才能猜得准）
+    const all = cats.flatMap(c => GEAR_KEYWORDS[c]);
+    expect(all.length).toBeGreaterThanOrEqual(300);
+  });
+  it('取舍顺序表与关键词表一一对应（不漏分类、不写了不存在的分类）', () => {
+    const cats = CAT_ORDER.filter(c => c !== '自定义');
+    expect([...GEAR_TIE_BREAK].sort()).toEqual([...cats].sort());
+  });
+  it('常见物品都能猜对分类', () => {
+    const table: [string, string][] = [
+      ['充电宝', '电子'], ['数据线', '电子'], ['氮化镓充电器', '电子'], ['蓝牙耳机', '电子'],
+      ['相机电池', '电子'], ['iPad', '电子'], ['移动电源', '电子'], ['多功能插座', '电子'],
+      ['牙刷', '洗漱'], ['压缩毛巾', '洗漱'], ['折叠拖鞋', '洗漱'], ['分装瓶', '洗漱'],
+      ['速干浴巾', '洗漱'], ['剃须刀', '洗漱'], ['卸妆棉', '洗漱'], ['便携餐具', '洗漱'],
+      ['内衣裤', '衣物'], ['袜子', '衣物'], ['换洗上衣', '衣物'], ['羽绒外套', '衣物'],
+      ['泳衣', '衣物'], ['腰带', '衣物'], ['脏衣袋', '衣物'], ['折叠衣架', '衣物'],
+      ['行李箱', '出行'], ['双肩背包', '出行'], ['折叠伞', '出行'], ['颈枕', '出行'],
+      ['湿巾', '卫生'], ['一次性马桶垫', '卫生'], ['酒精喷雾', '卫生'], ['一次性床单', '卫生'],
+      ['隔离贴膜', '卫生'], ['粘毛器', '卫生'],
+      ['耳塞', '睡眠'], ['眼罩', '睡眠'], ['蒸汽眼罩', '睡眠'], ['遮光窗帘', '睡眠'],
+      ['驱蚊液', '驱蚊'], ['花露水', '驱蚊'], ['电蚊香', '驱蚊'], ['清凉油', '驱蚊'],
+      ['阻门器', '安全'], ['小型手电筒', '安全'], ['门锁报警器', '安全'], ['口哨', '安全'],
+      ['老人拐杖', '适老'], ['防滑拖鞋', '适老'], ['电子血压计', '适老'], ['感应小夜灯', '适老'],
+      ['儿童牙刷', '儿童'], ['婴儿湿巾', '儿童'], ['纸尿裤', '儿童'], ['奶粉', '儿童'],
+      ['常用药品', '健康'], ['创可贴', '健康'], ['晕车药', '健康'], ['医用口罩', '健康'],
+      ['洗衣片', '长住'], ['便携洗衣液', '长住'], ['熨斗', '长住'],
+      ['大桶矿泉水', '补给'], ['瓶装水', '补给'], ['泡面', '补给'], ['零食', '补给'],
+    ];
+    for (const [name, cat] of table) {
+      expect(guessGearCat(name), `「${name}」应猜为 ${cat}`).toBe(cat);
+    }
+  });
+  it('更具体的分类优先：「儿童拖鞋」是儿童，不是洗漱', () => {
+    expect(guessGearCat('儿童拖鞋')).toBe('儿童');
+    expect(guessGearCat('防滑拖鞋')).toBe('适老');
+    expect(guessGearCat('拖鞋')).toBe('洗漱');
+  });
+  it('两代人都用的物品按儿童优先（适老可手动改）', () => {
+    expect(guessGearCat('纸尿裤')).toBe('儿童');
+    expect(guessGearCat('成人纸尿裤')).toBe('适老');
+    expect(guessGearCat('护理垫')).toBe('适老');
+  });
+  it('猜不出来返回 null（由用户自己选，不能瞎猜）', () => {
+    for (const n of ['', '   ', '神秘小物', 'aaa', '这个东西']) {
+      expect(guessGearCat(n)).toBeNull();
+    }
+  });
+  it('大小写与空白不影响匹配', () => {
+    expect(guessGearCat('  ipad  ')).toBe('电子');
+    expect(guessGearCat('T恤')).toBe('衣物');
+    expect(guessGearCat('t恤')).toBe('衣物');
+  });
+  it('联想结果一定是合法分类（不会返回「自定义」）', () => {
+    for (const c of Object.keys(GEAR_KEYWORDS)) {
+      expect(GEAR_CATS).toContain(c);
+      expect(c).not.toBe('自定义');
+    }
   });
 });
 

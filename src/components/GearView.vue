@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
 import { Plus, RotateCcw, Trash2, X } from 'lucide-vue-next';
 import { GEAR_CATS, addGear, listGear, removeGear, resetGear } from '../engine';
+import { guessGearCat } from '../data';
 import type { GearEntry } from '../types';
 
 // 一条 = 物品名称 + 品牌：只写品牌看不出这是什么，所以名称必填、品牌可空
@@ -24,14 +25,22 @@ const open = ref(false);
 const newName = ref('');
 const newBrand = ref('');
 const addCat = ref(GEAR_CATS[0]);
+/** 用户是否手动点过分类标签：点过就以手动为准，联想不再覆盖 */
+const catTouched = ref(false);
 const err = ref('');
 const nameInput = ref<HTMLInputElement | null>(null);
+
+/** 按名称联想分类；猜不出来返回 null（保持当前选择） */
+const guessedCat = computed(() => guessGearCat(newName.value));
+/** 当前分类是联想来的（而非用户手动选的） */
+const catIsGuessed = computed(() => !catTouched.value && !!guessedCat.value);
 
 function openAdd() {
   newName.value = '';
   newBrand.value = '';
   err.value = '';
   addCat.value = GEAR_CATS[0];
+  catTouched.value = false;
   open.value = true;
   document.addEventListener('keydown', onKey);
   void nextTick(() => nameInput.value?.focus());
@@ -42,6 +51,18 @@ function closeAdd() {
 }
 function onKey(e: KeyboardEvent) { if (e.key === 'Escape') closeAdd(); }
 onBeforeUnmount(() => document.removeEventListener('keydown', onKey));
+
+/** 输入名称时实时联想；用户手动点过标签后不再改动他的选择 */
+function onNameInput() {
+  err.value = '';
+  if (catTouched.value) return;
+  const g = guessGearCat(newName.value);
+  if (g) addCat.value = g;
+}
+function pickCat(c: string) {
+  addCat.value = c;
+  catTouched.value = true;
+}
 
 function save() {
   const name = newName.value.trim();
@@ -97,7 +118,7 @@ function restore() {
 
         <div class="gfield">
           <label for="gdlg-name">物品名称 <span class="req">必填</span></label>
-          <input id="gdlg-name" ref="nameInput" v-model="newName" type="text" class="ginput" placeholder="如：充电宝、耳塞、拖鞋" @input="err = ''">
+          <input id="gdlg-name" ref="nameInput" v-model="newName" type="text" class="ginput" placeholder="如：充电宝、耳塞、拖鞋" @input="onNameInput">
         </div>
 
         <div class="gfield">
@@ -106,9 +127,9 @@ function restore() {
         </div>
 
         <div class="gfield">
-          <span class="glabel">分类</span>
-          <div class="catchips">
-            <button v-for="c in GEAR_CATS" :key="c" type="button" class="catchip" :class="{ on: addCat === c }" @click="addCat = c">{{ c }}</button>
+          <span class="glabel">分类<span v-if="catIsGuessed" class="ghint">已按物品名称选择，可改</span></span>
+          <div class="catchips" :class="{ pulse: catIsGuessed }" :key="catIsGuessed ? addCat : ''">
+            <button v-for="c in GEAR_CATS" :key="c" type="button" class="catchip" :class="{ on: addCat === c, guessed: catIsGuessed && addCat === c }" @click="pickCat(c)">{{ c }}</button>
           </div>
         </div>
 
@@ -175,7 +196,9 @@ function restore() {
 .gclose:hover { background: rgba(35, 41, 37, 0.12); color: var(--ink); }
 .gdlg-sub { margin: 3px 0 14px; font-size: 12.5px; color: var(--ink-2); }
 .gfield { margin-bottom: 12px; }
-.gfield label, .glabel { display: block; margin-bottom: 5px; font-size: 12.5px; color: var(--ink-2); }
+.gfield label { display: block; margin-bottom: 5px; font-size: 12.5px; color: var(--ink-2); }
+.glabel { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; font-size: 12.5px; color: var(--ink-2); }
+.ghint { font-size: 11px; color: var(--gold); }
 .req { font-size: 11px; color: var(--red); }
 .opt { font-size: 11px; color: var(--ink-3); }
 .ginput {
@@ -191,6 +214,10 @@ function restore() {
   font-size: 13px; color: var(--ink);
 }
 .catchip.on { border-color: var(--pine); background: rgba(28, 90, 74, 0.1); color: var(--pine-deep); font-weight: 650; }
+/* 联想选中的标签：金色虚线，和用户手点的实线区分开 */
+.catchip.guessed { border-color: var(--gold); border-style: dashed; background: rgba(169, 133, 61, 0.1); color: #8a6a2c; }
+.catchips.pulse { animation: gpulse 0.32s ease-out; }
+@keyframes gpulse { from { transform: scale(0.97); opacity: 0.6; } to { transform: none; opacity: 1; } }
 .gerr { margin: 2px 0 0; font-size: 12.5px; color: var(--red); }
 .gdlg-foot { display: flex; gap: 10px; margin-top: 18px; }
 .gdlg-foot .btn { flex: 1; }
