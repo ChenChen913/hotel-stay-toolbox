@@ -103,7 +103,7 @@ function next() {
 function save() {
   const s = newStay(JSON.parse(JSON.stringify(draft)) as Conditions, JSON.parse(JSON.stringify(preview.value)));
   saveStay(s);
-  openStay(s.id);
+  openStay(s.id, true);
 }
 </script>
 

@@ -43,7 +43,7 @@ function copyLast() {
   s.custom = JSON.parse(JSON.stringify(last.custom));
   s.custom.forEach(i => { i.done = false; });
   saveStay(s);
-  openStay(s.id);
+  openStay(s.id, true);
 }
 
 function summary(s: Stay) {
