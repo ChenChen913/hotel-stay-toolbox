@@ -21,9 +21,18 @@ const HINTS: { icon: string; text: string }[] = [
 
 const step = ref(1);
 const customDate = ref(false);
+function fxNames(on: Conditions, off: Conditions): string[] {
+  const B = new Set(buildPrep(off).map(i => i.name));
+  return buildPrep(on).filter(i => !B.has(i.name)).map(i => i.name);
+}
 const dstr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 function setOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); draft.date = dstr(d); customDate.value = false; }
 function isOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); return draft.date === dstr(d); }
+const fxChildren = computed(() => fxNames(
+  { ...draft, children: draft.children, childAge: draft.childAge },
+  { ...draft, children: 0 },
+));
+const fxElderly = computed(() => fxNames({ ...draft, elderly: true }, { ...draft, elderly: false }));
 const TOTAL = 6;
 
 /** 入住日 + 晚数 = 退房日，给个即时反馈 */
@@ -48,6 +57,28 @@ const ages: { v: ChildAge; t: string }[] = [
 // 预览用 ref（不能用 computed：computed 重算会丢掉用户在预览页添加的自定义物品）
 const preview = ref<PrepItem[]>([]);
 const previewCats = computed(() => [...new Set(preview.value.map(i => i.cat))]);
+const conditionEffects = computed(() => {
+  const out: { cond: string; items: string }[] = [];
+  if (draft.adults > 1) out.push({ cond: `${draft.adults} 人入住`, items: `每人份物品按 ${draft.adults} 份准备` });
+  out.push({ cond: `${draft.nights} 晚`, items: draft.nights >= 4 ? `消耗品按 ${draft.nights + 1} 份/人，并加入洗衣、晾衣用品` : `消耗品按 ${draft.nights + 1} 份/人` });
+  if (draft.children > 0) {
+    const c = fxNames({ ...draft, children: draft.children, childAge: draft.childAge }, { ...draft, children: 0 });
+    if (c.length) out.push({ cond: `儿童 ${draft.children} 位（${draft.childAge} 岁）`, items: c.join('、') });
+  }
+  if (draft.elderly) {
+    const o = fxNames({ ...draft, elderly: true }, { ...draft, elderly: false });
+    if (o.length) out.push({ cond: '有老人', items: o.join('、') });
+  }
+  const pOn = (k: 'sleep' | 'hygiene' | 'mosquito' | 'gadgets', label: string) => {
+    const o = fxNames({ ...draft, prefs: { ...draft.prefs, [k]: true } }, { ...draft, prefs: { ...draft.prefs, [k]: false } });
+    if (o.length) out.push({ cond: label, items: o.join('、') });
+  };
+  if (draft.prefs.sleep) pOn('sleep', '睡眠敏感');
+  if (draft.prefs.hygiene) pOn('hygiene', '在意卫生');
+  if (draft.prefs.mosquito) pOn('mosquito', '蚊虫季节');
+  if (draft.prefs.gadgets) pOn('gadgets', '电子设备多');
+  return out;
+});
 
 const customName = ref('');
 const customQty = ref(1);
@@ -133,9 +164,13 @@ function save() {
         <div class="chips">
           <button v-for="a in ages" :key="a.v" class="chip" :class="{ on: draft.childAge === a.v }" @click="draft.childAge = a.v">{{ a.t }}</button>
         </div>
+        <p class="fxline">＋将加入：{{ fxChildren.join('、') }}</p>
       </template>
       <div class="switch-rows">
-        <div class="srow"><span class="slabel">有老人同行</span><Toggle v-model="draft.elderly" /></div>
+        <div class="srowwrap">
+          <div class="srow"><span class="slabel">有老人同行</span><Toggle v-model="draft.elderly" /></div>
+          <p v-if="draft.elderly" class="fxline">＋将加入：{{ fxElderly.join('、') }}</p>
+        </div>
         <div class="srow"><span class="slabel">有宠物同行<span v-if="draft.pet" class="muted">（用品稍后自行添加）</span></span><Toggle v-model="draft.pet" /></div>
       </div>
     </div>
@@ -156,15 +191,26 @@ function save() {
     <h2 class="q">你在意哪些方面？<small class="muted">选中的会加进清单，之后随时可改</small></h2>
     <div class="glass card">
       <div class="srow"><span class="slabel"><Moon :size="16" class="sicon" />睡眠敏感</span><Toggle v-model="draft.prefs.sleep" /></div>
+      <p v-if="draft.prefs.sleep" class="fxline">＋将加入：眼罩、耳塞</p>
       <div class="srow"><span class="slabel"><Droplets :size="16" class="sicon" />在意卫生</span><Toggle v-model="draft.prefs.hygiene" /></div>
+      <p v-if="draft.prefs.hygiene" class="fxline">＋将加入：一次性床单/隔脏睡袋</p>
       <div class="srow"><span class="slabel"><Bug :size="16" class="sicon" />蚊虫季节</span><Toggle v-model="draft.prefs.mosquito" /></div>
+      <p v-if="draft.prefs.mosquito" class="fxline">＋将加入：驱蚊液/花露水</p>
       <div class="srow"><span class="slabel"><Plug :size="16" class="sicon" />电子设备多</span><Toggle v-model="draft.prefs.gadgets" /></div>
+      <p v-if="draft.prefs.gadgets" class="fxline">＋将加入：氮化镓多口充电器、USB 数据阻断器、魔方插座</p>
     </div>
   </template>
 
   <!-- ⑥ 确认清单 -->
   <template v-else>
     <h2 class="q">确认清单<small class="muted">可改数量、可删，保存后也能随时加东西</small></h2>
+    <div class="glass card fxcards">
+      <div class="think-title"><SlidersHorizontal :size="15" />这些选择如何影响清单</div>
+      <div v-for="(fx, i) in conditionEffects" :key="i" class="hint-row">
+        <span class="fxcond">{{ fx.cond }}</span><span class="muted">{{ fx.items }}</span>
+      </div>
+      <div class="hint-row"><span class="fxcond">数量规则</span><span class="muted">消耗品 = 人数 ×（晚数 + 1），上衣每人封顶 4 件，均可手动调整</span></div>
+    </div>
     <template v-for="cat in previewCats" :key="cat">
       <div class="sec-label">{{ cat }}</div>
       <div class="glass card">
@@ -229,6 +275,9 @@ function save() {
 }
 .nightsrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .hint { margin: 12px 0 0; }
+.fxline { margin: 6px 0 2px; font-size: 12.5px; color: var(--pine-deep); background: rgba(28, 90, 74, 0.07); border-radius: 8px; padding: 6px 10px; }
+.fxcards { margin-bottom: 14px; }
+.fxcond { flex-shrink: 0; font-weight: 650; color: var(--ink); font-size: 12.5px; min-width: 96px; }
 .nights { display: flex; align-items: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 10px; }
 .chip {
