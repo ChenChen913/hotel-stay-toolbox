@@ -64,7 +64,9 @@ const isPast = (s: string) => !!s && s < todayStr;
 </template>
 
 <style scoped>
-.dpk { padding: 4px 2px 0; }
+/* 限宽：大屏下不撑成一排 80px 的巨格 */
+.dpk { padding: 4px 2px 0; max-width: 360px; margin: 0 auto; }
+@media (max-width: 400px) { .dpk { padding: 4px 0 0; } }
 .dpk-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .dpk-nav {
   display: inline-flex; align-items: center; justify-content: center;
@@ -76,12 +78,18 @@ const isPast = (s: string) => !!s && s < todayStr;
 .dpk-nav:active { background: rgba(28, 90, 74, 0.14); transform: scale(0.94); }
 .dpk-title { font-size: 15px; font-weight: 600; color: var(--pine-deep); letter-spacing: 0.02em; }
 .dpk-title b { font-size: 16.5px; font-weight: 700; }
-.dpk-week { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+/* 标头与日期格必须同轨：同样的 minmax(0,1fr) + 同样的 gap，否则列宽算出来不同就会错位。
+   minmax(0,·) 是必需的：1fr 默认等价 minmax(auto,·)，日期格的 aspect-ratio + min-height 会把
+   42px 反向传导成「最小宽度」，窄屏下 7 列撑不下就会整体横向溢出。 */
+.dpk-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin-bottom: 4px; }
 .dpk-week span { text-align: center; font-size: 11.5px; color: var(--ink-3); padding: 2px 0; }
-.dpk-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.dpk-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+/* 不要给日期格加 aspect-ratio：一旦配合 min-height，宽高比会把高度反向算成宽度，
+   格子就不再 stretch 填满列宽，窄屏下会互相叠出去（错位+溢出的根因）。
+   高度给死、宽度交给 grid track，标头与日期格才是同一套坐标。 */
 .dpk-day {
   position: relative;
-  aspect-ratio: 1 / 1; min-height: 42px;
+  min-width: 0; min-height: 42px;
   display: flex; align-items: center; justify-content: center;
   border: 1px solid transparent; border-radius: 12px; cursor: pointer;
   background: transparent; color: var(--ink);

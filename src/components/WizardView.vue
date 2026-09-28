@@ -204,13 +204,22 @@ function save() {
 .fl { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2); margin-bottom: 9px; }
 .datebig { font-size: 21px; font-weight: 700; color: var(--pine-deep); margin-bottom: 3px; }
 .leave { margin: 0 0 8px; }
-.quickrow { display: flex; gap: 8px; margin: 12px 0 12px; }
+.quickrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 12px; }
 .qchip {
-  flex: 1; min-height: 40px; border-radius: 11px; cursor: pointer;
+  min-height: 40px; padding: 0 8px; border-radius: 11px; cursor: pointer;
   border: 1.5px solid var(--glass-border); background: rgba(255, 255, 255, 0.6);
   font-size: 14.5px; color: var(--ink); transition: all 0.15s;
+  white-space: nowrap; /* 不再让「自选日期」被折断成 3+1 */
 }
 .qchip.on { border-color: var(--pine); background: rgba(28, 90, 74, 0.1); color: var(--pine-deep); font-weight: 650; }
+/* 手机窄屏：4 颗挤在一排每颗只剩 ~57px，「自选日期」会被折断 → 改 2×2；
+   同时收紧卡片与月历内边距，把宽度让给日期格 */
+@media (max-width: 480px) {
+  .card { padding: 14px; }
+  .quickrow { grid-template-columns: repeat(2, 1fr); }
+  .qchip { min-height: 44px; }
+  .dslot { padding: 12px 6px 10px; }
+}
 .dslot {
   margin: 4px 0 16px; padding: 12px 10px 10px;
   border-radius: 16px;
