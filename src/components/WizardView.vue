@@ -8,6 +8,7 @@ import Stepper from './Stepper.vue';
 import Toggle from './Toggle.vue';
 import ItemRow from './ItemRow.vue';
 import ClothingAdd from './ClothingAdd.vue';
+import DatePicker from './DatePicker.vue';
 
 const HINT_ICONS: Record<string, typeof Briefcase> = { briefcase: Briefcase, camera: Camera, pill: Pill, baby: Baby, 'paw-print': PawPrint };
 const HINTS: { icon: string; text: string }[] = [
@@ -24,6 +25,14 @@ const dstr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStar
 function setOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); draft.date = dstr(d); customDate.value = false; }
 function isOffset(n: number) { const d = new Date(); d.setDate(d.getDate() + n); return draft.date === dstr(d); }
 const TOTAL = 6;
+
+/** 入住日 + 晚数 = 退房日，给个即时反馈 */
+const leaveLabel = computed(() => {
+  if (!draft.date) return '';
+  const [y, m, d] = draft.date.split('-').map(Number);
+  const t = new Date(y, m - 1, d + draft.nights);
+  return fmtDate(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`);
+});
 
 function defaultDraft(): Conditions {
   return { date: '', nights: 1, adults: 1, children: 0, childAge: '0-3', elderly: false, pet: false,
@@ -81,13 +90,16 @@ function save() {
     <h2 class="q">什么时候入住？</h2>
     <div class="glass card">
       <div class="datebig num">{{ draft.date ? fmtDate(draft.date) : '先选好日子' }}</div>
+      <p v-if="leaveLabel" class="muted leave">退房 {{ leaveLabel }} · 共 {{ draft.nights }} 晚</p>
       <div class="quickrow">
-        <button type="button" class="qchip" :class="{ on: isOffset(0) }" @click="setOffset(0)">今天</button>
-        <button type="button" class="qchip" :class="{ on: isOffset(1) }" @click="setOffset(1)">明天</button>
-        <button type="button" class="qchip" :class="{ on: isOffset(2) }" @click="setOffset(2)">后天</button>
-        <button type="button" class="qchip" :class="{ on: isOffset(-1) }" @click="customDate = true">自选日期</button>
+        <button type="button" class="qchip" :class="{ on: !customDate && isOffset(0) }" @click="setOffset(0)">今天</button>
+        <button type="button" class="qchip" :class="{ on: !customDate && isOffset(1) }" @click="setOffset(1)">明天</button>
+        <button type="button" class="qchip" :class="{ on: !customDate && isOffset(2) }" @click="setOffset(2)">后天</button>
+        <button type="button" class="qchip" :class="{ on: customDate }" @click="customDate = !customDate">自选日期</button>
       </div>
-      <input v-if="customDate" v-model="draft.date" type="date" class="field datefield">
+      <div v-if="customDate" class="dslot">
+        <DatePicker v-model="draft.date" />
+      </div>
       <div class="nightsrow">
         <span class="fl"><Compass :size="16" />住几晚</span>
         <Stepper v-model="draft.nights" :min="1" :max="30" unit="晚" />
@@ -190,7 +202,8 @@ function save() {
 .q small { display: block; font-size: 13px; color: var(--ink-2); font-weight: 400; margin-top: 5px; font-family: var(--sans); letter-spacing: 0; }
 .card { padding: 18px; }
 .fl { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2); margin-bottom: 9px; }
-.datebig { font-size: 21px; font-weight: 700; color: var(--pine-deep); margin-bottom: 12px; }
+.datebig { font-size: 21px; font-weight: 700; color: var(--pine-deep); margin-bottom: 3px; }
+.leave { margin: 0 0 8px; }
 .quickrow { display: flex; gap: 8px; margin: 12px 0 12px; }
 .qchip {
   flex: 1; min-height: 40px; border-radius: 11px; cursor: pointer;
@@ -198,7 +211,13 @@ function save() {
   font-size: 14.5px; color: var(--ink); transition: all 0.15s;
 }
 .qchip.on { border-color: var(--pine); background: rgba(28, 90, 74, 0.1); color: var(--pine-deep); font-weight: 650; }
-.datefield { margin-top: 12px; }
+.dslot {
+  margin: 4px 0 6px; padding: 12px 10px 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
 .nightsrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .hint { margin: 12px 0 0; }
 .nights { display: flex; align-items: center; }
